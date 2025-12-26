@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Zap, Code2, Terminal, MessageSquare } from 'lucide-react';
+import { Zap, MessageSquare, Eye } from 'lucide-react';
 import Editor from '@monaco-editor/react';
-
+import CodeFlowChartViewer from './CodeFlowChartViewer';
 // Purple Haze Theme Configuration for Monaco
 const PURPLE_HAZE_THEME = {
   base: 'vs-dark',
@@ -35,59 +35,48 @@ const PURPLE_HAZE_THEME = {
   }
 };
 
-const CODE_TEMPLATES = {
-  javascript: `// Synthwave JS Mode
-import React, { useState, useEffect } from 'react';
-
-const CyberComponent = () => {
-  const [energy, setEnergy] = useState(100);
-
-  // Initialize the neural link
-  useEffect(() => {
-    console.log("System Online. Aesthetic: Maximum.");
-    return () => disconnect();
-  }, []);
-
-  return (
-    <div className="neon-container">
-      <h1>Hello World</h1>
-      <p>Energy Level: {energy}%</p>
-    </div>
-  );
-};`,
-  python: `# Cyberpunk Python Script
-import os
+const DEFAULT_PYTHON_CODE = `# Python Algorithm Workspace
 import sys
-from cyber_utils import NeuralLink
 
-class NeonCity:
-    def __init__(self, population):
-        self.population = population
-        self.energy_grid = "STABLE"
-
-    def night_cycle(self):
-        """Activates the neon lights."""
-        intensity = 0.95
-        print(f"City glow set to {intensity * 100}%")
-        return True
+def check_prime(n):
+    """Check if a number is prime."""
+    if n < 2:
+        return False
+    
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+    
+    return True
 
 def main():
-    city = NeonCity(5000000)
-    if city.night_cycle():
-        print("Welcome to the grid.")
+    number = 17
+    result = check_prime(number)
+    
+    if result:
+        print(f"{number} is a prime number")
+    else:
+        print(f"{number} is not a prime number")
 
 if __name__ == "__main__":
-    main()`
-};
+    main()`;
 
 export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
-  const [language, setLanguage] = useState('javascript');
-  const [code, setCode] = useState(CODE_TEMPLATES.javascript);
+  const [code, setCode] = useState(() => {
+    const savedCode = localStorage.getItem('algoflow_code');
+    return savedCode || DEFAULT_PYTHON_CODE;
+  });
   const [isLoaded, setIsLoaded] = useState(false);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
+  const [showVisualizer, setShowVisualizer] = useState(false);
   
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
+
+  // Save code to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('algoflow_code', code);
+  }, [code]);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 800);
@@ -109,12 +98,6 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
         col: e.position.column
       });
     });
-  };
-
-  const handleLanguageSwitch = () => {
-    const newLang = language === 'javascript' ? 'python' : 'javascript';
-    setLanguage(newLang);
-    setCode(CODE_TEMPLATES[newLang]);
   };
 
   const handleRun = () => {
@@ -168,66 +151,16 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
           }}>
             PURPLE HAZE EDITOR
           </span>
-        </div>
-
-        {/* Center - Language Selector */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          backgroundColor: 'rgba(255,255,255,0.03)',
-          borderRadius: '8px',
-          padding: '4px',
-          border: '1px solid rgba(255,255,255,0.05)'
-        }}>
-          <button
-            onClick={() => {
-              setLanguage('javascript');
-              setCode(CODE_TEMPLATES.javascript);
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: '6px',
-              border: 'none',
-              backgroundColor: language === 'javascript' ? 'rgba(168,85,247,0.2)' : 'transparent',
-              color: language === 'javascript' ? '#e9d5ff' : '#94a3b8',
-              fontSize: '12px',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontFamily: 'monospace'
-            }}
-          >
-            <Code2 size={14} color={language === 'javascript' ? '#facc15' : '#64748b'} />
-            JavaScript
-          </button>
-          <button
-            onClick={() => {
-              setLanguage('python');
-              setCode(CODE_TEMPLATES.python);
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: '6px',
-              border: 'none',
-              backgroundColor: language === 'python' ? 'rgba(168,85,247,0.2)' : 'transparent',
-              color: language === 'python' ? '#e9d5ff' : '#94a3b8',
-              fontSize: '12px',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontFamily: 'monospace'
-            }}
-          >
-            <Terminal size={14} color={language === 'python' ? '#60a5fa' : '#64748b'} />
+          <span style={{
+            fontSize: '11px',
+            color: '#94a3b8',
+            padding: '4px 8px',
+            backgroundColor: 'rgba(96,165,250,0.15)',
+            borderRadius: '4px',
+            border: '1px solid rgba(96,165,250,0.3)'
+          }}>
             Python
-          </button>
+          </span>
         </div>
 
         {/* Right side - Run Button */}
@@ -260,6 +193,36 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
           >
             <Zap size={14} />
             Run Code
+          </button>
+
+          <button
+            onClick={() => setShowVisualizer(!showVisualizer)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 16px',
+              borderRadius: '8px',
+              border: '1px solid rgba(168,85,247,0.3)',
+              backgroundColor: showVisualizer ? 'rgba(168,85,247,0.25)' : 'rgba(168,85,247,0.15)',
+              color: '#e9d5ff',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              fontFamily: 'monospace'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.3)';
+              e.currentTarget.style.borderColor = 'rgba(168,85,247,0.5)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = showVisualizer ? 'rgba(168,85,247,0.25)' : 'rgba(168,85,247,0.15)';
+              e.currentTarget.style.borderColor = 'rgba(168,85,247,0.3)';
+            }}
+          >
+            <Eye size={14} />
+            Visualize
           </button>
 
           <button
@@ -304,15 +267,16 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
       }}>
         <Editor
           height="100%"
-          language={language}
+          language="python"
           value={code}
           onChange={(value) => setCode(value || '')}
           onMount={handleEditorDidMount}
           theme="purple-haze"
           options={{
-            fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+            fontFamily: "Consolas, 'Courier New', monospace",
             fontSize: 14,
-            lineHeight: 24,
+            lineHeight: 20,
+            fontLigatures: false,
             minimap: {
               enabled: true,
               side: 'right',
@@ -330,12 +294,12 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
             lineNumbers: 'on',
             renderLineHighlight: 'all',
             cursorBlinking: 'smooth',
-            cursorSmoothCaretAnimation: 'on',
+            cursorSmoothCaretAnimation: false,
             smoothScrolling: true,
             padding: { top: 16, bottom: 16 },
-            tabSize: 2,
+            tabSize: 4,
             automaticLayout: true,
-            wordWrap: 'on',
+            wordWrap: 'off',
             folding: true,
             glyphMargin: false,
             lineDecorationsWidth: 10,
@@ -349,6 +313,68 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
           }}
         />
       </div>
+
+      {/* Visualizer Modal Overlay */}
+      {showVisualizer && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          zIndex: 1000,
+          display: 'flex',
+          flexDirection: 'column',
+          backdropFilter: 'blur(8px)'
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '16px 24px',
+            borderBottom: '1px solid rgba(255,255,255,0.1)',
+            backgroundColor: 'rgba(10,6,18,0.9)'
+          }}>
+            <div style={{
+              fontSize: '18px',
+              fontWeight: 600,
+              color: '#e9d5ff',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px'
+            }}>
+              <Eye size={20} color="#a855f7" />
+              <span>Flow Visualizer</span>
+            </div>
+            <button
+              onClick={() => setShowVisualizer(false)}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: '1px solid rgba(168,85,247,0.3)',
+                backgroundColor: 'rgba(168,85,247,0.15)',
+                color: '#e9d5ff',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.25)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.15)';
+              }}
+            >
+              Close Visualizer
+            </button>
+          </div>
+          <div style={{ flex: 1, overflow: 'hidden' }}>
+            <CodeFlowChartViewer />
+          </div>
+        </div>
+      )}
 
       {/* --- Footer / Status Bar --- */}
       <div style={{
@@ -380,7 +406,7 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
            <span>Ln {cursorPos.line}, Col {cursorPos.col}</span>
            <span>UTF-8</span>
-           <span style={{ textTransform: 'uppercase' }}>{language}</span>
+           <span>Python</span>
         </div>
       </div>
       
