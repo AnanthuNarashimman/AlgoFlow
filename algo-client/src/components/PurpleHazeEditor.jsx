@@ -82,7 +82,7 @@ def main():
 if __name__ == "__main__":
     main()`;
 
-export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
+export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChange }) {
   const [code, setCode] = useState(() => {
     const savedCode = localStorage.getItem('algoflow_code');
     return savedCode || DEFAULT_PYTHON_CODE;
@@ -114,7 +114,11 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
   // Save code to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('algoflow_code', code);
-  }, [code]);
+    // Notify parent component of code changes
+    if (onCodeChange) {
+      onCodeChange(code);
+    }
+  }, [code, onCodeChange]);
 
   // Save output to sessionStorage whenever it changes
   useEffect(() => {

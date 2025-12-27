@@ -1,8 +1,183 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Send, GripVertical, User, Bot, 
-  Sparkles, Zap, BookOpen, HelpCircle, MoreHorizontal, Code, X
+  Sparkles, Zap, BookOpen, HelpCircle, MoreHorizontal, Code, X, AlertCircle
 } from 'lucide-react';
+
+// Enhanced markdown-to-JSX renderer
+const renderMarkdown = (text) => {
+  const parts = [];
+  let lastIndex = 0;
+  
+  // Match code blocks with ```
+  const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+  let match;
+  
+  while ((match = codeBlockRegex.exec(text)) !== null) {
+    // Add text before code block
+    if (match.index > lastIndex) {
+      parts.push(
+        <span key={`text-${lastIndex}`}>
+          {processInlineMarkdown(text.substring(lastIndex, match.index))}
+        </span>
+      );
+    }
+    
+    // Add code block
+    const language = match[1] || 'python';
+    const codeContent = match[2];
+    parts.push(
+      <pre key={`code-${match.index}`} style={{
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        padding: '10px',
+        borderRadius: '6px',
+        overflow: 'auto',
+        marginTop: '6px',
+        marginBottom: '6px',
+        border: '1px solid rgba(168, 85, 247, 0.2)',
+        maxHeight: '200px'
+      }}>
+        <code style={{
+          fontFamily: 'Consolas, Monaco, monospace',
+          fontSize: '11.5px',
+          color: '#e2e8f0',
+          lineHeight: '1.4'
+        }}>
+          {codeContent}
+        </code>
+      </pre>
+    );
+    
+    lastIndex = match.index + match[0].length;
+  }
+  
+  // Add remaining text
+  if (lastIndex < text.length) {
+    parts.push(
+      <span key={`text-${lastIndex}`}>
+        {processInlineMarkdown(text.substring(lastIndex))}
+      </span>
+    );
+  }
+  
+  return parts.length > 0 ? parts : text;
+};
+
+// Process inline markdown (headers, bold, inline code, lists)
+const processInlineMarkdown = (text) => {
+  const lines = text.split('\n');
+  return lines.map((line, lineIdx) => {
+    // Check for headers (## or ###)
+    if (line.startsWith('### ')) {
+      return (
+        <h3 key={lineIdx} style={{
+          fontSize: '12px',
+          fontWeight: 600,
+          color: '#e9d5ff',
+          marginTop: '8px',
+          marginBottom: '4px'
+        }}>
+          {processTextFormatting(line.substring(4))}
+        </h3>
+      );
+    } else if (line.startsWith('## ')) {
+      return (
+        <h2 key={lineIdx} style={{
+          fontSize: '13px',
+          fontWeight: 600,
+          color: '#e9d5ff',
+          marginTop: '10px',
+          marginBottom: '5px'
+        }}>
+          {processTextFormatting(line.substring(3))}
+        </h2>
+      );
+    } else if (line.trim().match(/^[\*\-]\s+/)) {
+      // Bullet point list item
+      const content = line.trim().replace(/^[\*\-]\s+/, '');
+      return (
+        <div key={lineIdx} style={{
+          display: 'flex',
+          gap: '8px',
+          marginLeft: '12px',
+          marginTop: '3px',
+          marginBottom: '3px'
+        }}>
+          <span style={{ color: '#a855f7', flexShrink: 0 }}>•</span>
+          <span>{processTextFormatting(content)}</span>
+        </div>
+      );
+    } else if (line.trim() === '') {
+      return <br key={lineIdx} />;
+    } else {
+      return (
+        <span key={lineIdx}>
+          {processTextFormatting(line)}
+          {lineIdx < lines.length - 1 && <br />}
+        </span>
+      );
+    }
+  });
+};
+
+// Process bold, italic, and inline code
+const processTextFormatting = (text) => {
+  const parts = [];
+  let currentText = text;
+  let key = 0;
+  
+  // Process bold (**text** or *text* for bold/italic), and inline code (`code`)
+  const regex = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g;
+  let match;
+  let lastIdx = 0;
+  
+  while ((match = regex.exec(currentText)) !== null) {
+    // Add text before match
+    if (match.index > lastIdx) {
+      parts.push(currentText.substring(lastIdx, match.index));
+    }
+    
+    const matched = match[0];
+    if (matched.startsWith('**') && matched.endsWith('**')) {
+      // Bold text with double asterisks
+      parts.push(
+        <strong key={key++} style={{ color: '#f1f5f9', fontWeight: 600 }}>
+          {matched.slice(2, -2)}
+        </strong>
+      );
+    } else if (matched.startsWith('*') && matched.endsWith('*') && !matched.startsWith('**')) {
+      // Italic or bold with single asterisk
+      parts.push(
+        <em key={key++} style={{ color: '#f1f5f9', fontStyle: 'italic', fontWeight: 500 }}>
+          {matched.slice(1, -1)}
+        </em>
+      );
+    } else if (matched.startsWith('`') && matched.endsWith('`')) {
+      // Inline code
+      parts.push(
+        <code key={key++} style={{
+          backgroundColor: 'rgba(168, 85, 247, 0.15)',
+          padding: '2px 5px',
+          borderRadius: '3px',
+          fontFamily: 'Consolas, Monaco, monospace',
+          fontSize: '11.5px',
+          color: '#e9d5ff'
+        }}>
+          {matched.slice(1, -1)}
+        </code>
+      );
+    }
+    
+    lastIdx = match.index + matched.length;
+  }
+  
+  // Add remaining text
+  if (lastIdx < currentText.length) {
+    parts.push(currentText.substring(lastIdx));
+  }
+  
+  return parts.length > 0 ? parts : text;
+};
 
 const INITIAL_MESSAGES = [
   { 
@@ -20,12 +195,14 @@ const SUGGESTION_CHIPS = [
   { id: 'help', label: 'Help', icon: HelpCircle },
 ];
 
-export default function DraggableSideChat({ width = 400, onWidthChange, onClose }) {
+export default function DraggableSideChat({ width = 400, onWidthChange, onClose, editorCode }) {
   // --- State ---
   const [isResizing, setIsResizing] = useState(false);
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [error, setError] = useState(null);
+  const [expandedMessages, setExpandedMessages] = useState({});
   
   // --- Refs ---
   const chatEndRef = useRef(null);
@@ -50,7 +227,7 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose 
       const newWidth = window.innerWidth - e.clientX;
       
       // Min/Max constraints
-      if (newWidth > 300 && newWidth < 800) {
+      if (newWidth > 300 && newWidth < 650) {
         onWidthChange(newWidth);
       }
     }
@@ -69,24 +246,58 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose 
   }, [isResizing]);
 
   // --- Chat Handlers ---
-  const sendMessage = (text) => {
+  const sendMessage = async (text) => {
     if (!text.trim()) return;
     
     const newMessage = { id: Date.now(), role: 'user', text: text, isCode: false };
     setMessages(prev => [...prev, newMessage]);
     setChatInput('');
     setIsTyping(true);
+    setError(null);
 
-    // Simulated AI Response
-    setTimeout(() => {
+    try {
+      // Get conversation history (last 5 messages for context)
+      const conversationHistory = messages.slice(-5).map(msg => ({
+        role: msg.role === 'user' ? 'user' : 'assistant',
+        text: msg.text
+      }));
+
+      const response = await fetch('http://localhost:4000/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code: editorCode || '',
+          message: text,
+          conversationHistory: conversationHistory
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
+      }
+
+      const data = await response.json();
+      
       setIsTyping(false);
       setMessages(prev => [...prev, { 
         id: Date.now() + 1, 
         role: 'ai', 
-        text: "I'm processing that request. This is a standalone demo of the chat interface.",
+        text: data.response,
         isCode: false 
       }]);
-    }, 1500);
+    } catch (error) {
+      console.error('Chat error:', error);
+      setIsTyping(false);
+      setError('Failed to connect to AI. Make sure the backend server is running on port 4000.');
+      setMessages(prev => [...prev, { 
+        id: Date.now() + 1, 
+        role: 'ai', 
+        text: "I apologize, but I'm having trouble connecting to the AI service right now. Please make sure the backend server is running.",
+        isCode: false 
+      }]);
+    }
   };
 
   const handleChatSubmit = (e) => {
@@ -280,7 +491,14 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose 
           flexDirection: 'column',
           gap: '20px'
         }}>
-          {messages.map((msg) => (
+          {messages.map((msg) => {
+            const isLongMessage = msg.text.length > 400;
+            const isExpanded = expandedMessages[msg.id];
+            const displayText = (isLongMessage && !isExpanded) 
+              ? msg.text.substring(0, 400) + '...' 
+              : msg.text;
+            
+            return (
             <div 
               key={msg.id} 
               style={{
@@ -319,9 +537,9 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose 
                   {msg.role === 'user' ? 'You' : 'Purple Haze AI'}
                 </div>
                 <div style={{
-                  padding: '10px 14px',
+                  padding: '10px 12px',
                   borderRadius: '12px',
-                  fontSize: '13px',
+                  fontSize: '12.5px',
                   lineHeight: '1.5',
                   fontFamily: 'Inter, sans-serif',
                   background: msg.role === 'user' ? 'rgba(168, 85, 247, 0.08)' : 'rgba(255, 255, 255, 0.03)',
@@ -333,11 +551,42 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose 
                   borderTopLeftRadius: msg.role === 'ai' ? '2px' : '12px',
                   wordWrap: 'break-word'
                 }}>
-                  {msg.text}
+                  {renderMarkdown(displayText)}
+                  {isLongMessage && (
+                    <button
+                      onClick={() => setExpandedMessages(prev => ({
+                        ...prev,
+                        [msg.id]: !prev[msg.id]
+                      }))}
+                      style={{
+                        marginTop: '8px',
+                        padding: '4px 10px',
+                        fontSize: '11px',
+                        color: '#a855f7',
+                        background: 'rgba(168, 85, 247, 0.08)',
+                        border: '1px solid rgba(168, 85, 247, 0.2)',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontFamily: 'Inter, sans-serif',
+                        fontWeight: 500,
+                        transition: 'all 0.2s',
+                        display: 'block'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(168, 85, 247, 0.15)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(168, 85, 247, 0.08)';
+                      }}
+                    >
+                      {isExpanded ? 'Show Less' : 'Show More'}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
           {isTyping && (
             <div style={{
               display: 'flex',
@@ -459,20 +708,36 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose 
           50% { transform: translateY(-3px); } 
         }
 
-        /* Custom scrollbar */
+        /* Custom slim scrollbar */
         div::-webkit-scrollbar {
-          width: 6px;
-          height: 6px;
+          width: 4px;
+          height: 4px;
         }
         div::-webkit-scrollbar-track {
           background: transparent;
         }
         div::-webkit-scrollbar-thumb {
-          background: #2d2440;
-          border-radius: 3px;
+          background: rgba(168, 85, 247, 0.2);
+          border-radius: 2px;
         }
         div::-webkit-scrollbar-thumb:hover {
-          background: #3d3050;
+          background: rgba(168, 85, 247, 0.35);
+        }
+        
+        /* Slim scrollbar for code blocks */
+        pre::-webkit-scrollbar {
+          width: 3px;
+          height: 3px;
+        }
+        pre::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        pre::-webkit-scrollbar-thumb {
+          background: rgba(168, 85, 247, 0.3);
+          border-radius: 2px;
+        }
+        pre::-webkit-scrollbar-thumb:hover {
+          background: rgba(168, 85, 247, 0.5);
         }
       `}</style>
 

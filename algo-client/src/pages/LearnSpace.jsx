@@ -5,6 +5,7 @@ import DraggableSideChat from '../components/DraggableSideChat';
 export default function LearnSpace() {
   const [chatWidth, setChatWidth] = useState(400);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [editorCode, setEditorCode] = useState('');
 
   return (
     <div style={{
@@ -27,7 +28,11 @@ export default function LearnSpace() {
         overflow: 'hidden',
         flexShrink: 0
       }}>
-        <PurpleHazeEditor onToggleChat={() => setIsChatOpen(!isChatOpen)} isChatOpen={isChatOpen} />
+        <PurpleHazeEditor 
+          onToggleChat={() => setIsChatOpen(!isChatOpen)} 
+          isChatOpen={isChatOpen}
+          onCodeChange={setEditorCode}
+        />
       </div>
 
       {/* Chat Section - Resizable */}
@@ -41,6 +46,7 @@ export default function LearnSpace() {
             width={chatWidth} 
             onWidthChange={setChatWidth}
             onClose={() => setIsChatOpen(false)}
+            editorCode={editorCode}
           />
         </div>
       )}
