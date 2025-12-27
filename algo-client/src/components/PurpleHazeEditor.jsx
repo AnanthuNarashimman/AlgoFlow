@@ -35,8 +35,18 @@ const PURPLE_HAZE_THEME = {
   }
 };
 
-const DEFAULT_PYTHON_CODE = `# Python Algorithm Workspace
-import sys
+const DEFAULT_PYTHON_CODE = `# Python Algorithm Workspace - Interactive Mode
+# Try using input() - it works just like an online compiler!
+
+def greet_user():
+    """Interactive greeting function."""
+    name = input("Enter your name: ")
+    age = input("Enter your age: ")
+    
+    print(f"\\nHello, {name}!")
+    print(f"You are {age} years old.")
+    
+    return name, age
 
 def check_prime(n):
     """Check if a number is prime."""
@@ -50,13 +60,24 @@ def check_prime(n):
     return True
 
 def main():
-    number = 17
+    print("=== Interactive Python Environment ===\\n")
+    
+    # Interactive greeting
+    name, age = greet_user()
+    
+    # Prime number checker
+    print("\\n--- Prime Number Checker ---")
+    num_str = input("Enter a number to check if it's prime: ")
+    number = int(num_str)
+    
     result = check_prime(number)
     
     if result:
-        print(f"{number} is a prime number")
+        print(f"\\n✓ {number} is a prime number!")
     else:
-        print(f"{number} is not a prime number")
+        print(f"\\n✗ {number} is not a prime number.")
+    
+    print(f"\\nThanks for using the interactive terminal, {name}!")
 
 if __name__ == "__main__":
     main()`;
@@ -71,18 +92,70 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
   const [showVisualizer, setShowVisualizer] = useState(false);
   const [flowchartData, setFlowchartData] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [outputPanelOpen, setOutputPanelOpen] = useState(false);
+  const [outputPanelHeight, setOutputPanelHeight] = useState(250);
+  const [output, setOutput] = useState(() => {
+    // Load output from sessionStorage (cleared on page close/refresh)
+    const savedOutput = sessionStorage.getItem('algoflow_output');
+    return savedOutput ? JSON.parse(savedOutput) : [];
+  });
+  const [isRunning, setIsRunning] = useState(false);
+  const [pyodideReady, setPyodideReady] = useState(false);
+  const [waitingForInput, setWaitingForInput] = useState(false);
+  const [inputValue, setInputValue] = useState('');
   
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
+  const pyodideRef = useRef(null);
+  const isDraggingRef = useRef(false);
+  const inputResolverRef = useRef(null);
+  const inputFieldRef = useRef(null);
 
   // Save code to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('algoflow_code', code);
   }, [code]);
 
+  // Save output to sessionStorage whenever it changes
+  useEffect(() => {
+    sessionStorage.setItem('algoflow_output', JSON.stringify(output));
+  }, [output]);
+
+  // Clear sessionStorage on page unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      sessionStorage.removeItem('algoflow_output');
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 800);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Initialize Pyodide
+  useEffect(() => {
+    const loadPyodide = async () => {
+      try {
+        if (window.loadPyodide) {
+          setOutput(prev => [...prev, { type: 'info', content: 'Loading Python environment...' }]);
+          const pyodide = await window.loadPyodide({
+            indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'
+          });
+          
+          pyodideRef.current = pyodide;
+          setPyodideReady(true);
+          setOutput(prev => [...prev, { type: 'success', content: 'Python environment ready! Interactive mode enabled.' }]);
+        }
+      } catch (error) {
+        setOutput(prev => [...prev, { type: 'error', content: `Failed to load Python: ${error.message}` }]);
+      }
+    };
+    loadPyodide();
   }, []);
 
   const handleEditorDidMount = (editor, monaco) => {
@@ -102,10 +175,183 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
     });
   };
 
-  const handleRun = () => {
-    console.log('Running code...');
-    // Add run functionality here
+  const handleRun = async () => {
+    if (!pyodideReady) {
+      setOutput([{ type: 'error', content: 'Python environment is still loading. Please wait...' }]);
+      setOutputPanelOpen(true);
+      return;
+    }
+
+    if (!code.trim()) {
+      setOutput([{ type: 'error', content: 'No code to run!' }]);
+      setOutputPanelOpen(true);
+      return;
+    }
+
+    setIsRunning(true);
+    setOutput([]);
+    setWaitingForInput(false);
+    
+    // Open panel if closed
+    if (!outputPanelOpen) {
+      setOutputPanelOpen(true);
+    }
+
+    try {
+      const pyodide = pyodideRef.current;
+      
+      // Set up real-time output callbacks
+      const outputCallback = (text, type = 'stdout') => {
+        setOutput(prev => {
+          const lastItem = prev[prev.length - 1];
+          // Append to last item if it's the same type
+          if (lastItem && lastItem.type === type) {
+            return [
+              ...prev.slice(0, -1),
+              { ...lastItem, content: lastItem.content + text }
+            ];
+          }
+          return [...prev, { type, content: text }];
+        });
+      };
+
+      pyodide.globals.set('stdout_callback', (text) => outputCallback(text, 'stdout'));
+      pyodide.globals.set('stderr_callback', (text) => outputCallback(text, 'stderr'));
+
+      // Create input handler that returns a Promise
+      const inputHandler = (prompt) => {
+        return new Promise((resolve) => {
+          // Display prompt in output
+          if (prompt) {
+            outputCallback(prompt, 'stdout');
+          }
+          
+          setWaitingForInput(true);
+          inputResolverRef.current = resolve;
+          setTimeout(() => {
+            if (inputFieldRef.current) {
+              inputFieldRef.current.focus();
+            }
+          }, 100);
+        });
+      };
+
+      pyodide.globals.set('js_input', inputHandler);
+
+      // Setup interactive IO
+      await pyodide.runPythonAsync(`
+import sys
+from io import StringIO
+import builtins
+
+class InteractiveOutput:
+    def __init__(self, callback):
+        self.callback = callback
+        self.buffer = ""
+    
+    def write(self, text):
+        self.buffer += text
+        self.callback(text)
+        return len(text)
+    
+    def flush(self):
+        pass
+
+sys.stdout = InteractiveOutput(stdout_callback)
+sys.stderr = InteractiveOutput(stderr_callback)
+
+# Create a synchronous-looking input that actually awaits
+_original_input = builtins.input
+
+async def _async_input_wrapper(prompt=""):
+    result = await js_input(prompt)
+    return result
+
+# Make input work in async context
+builtins.input = _async_input_wrapper
+      `);
+
+      // Transform user code to await all input() calls
+      // This regex replaces input( with await input( but avoids already awaited calls
+      const transformedCode = code.replace(/(?<!await\s)(\b)input\s*\(/g, '$1await input(');
+
+      // Wrap user code to make all input() calls awaitable
+      const wrappedCode = `
+import builtins
+
+# Wrap the entire code in an async context
+async def __main__():
+${transformedCode.split('\n').map(line => '    ' + line).join('\n')}
+
+# Execute the main function
+await __main__()
+`;
+
+      // Run the wrapped user's code
+      await pyodide.runPythonAsync(wrappedCode);
+
+      // Add success message if no output
+      setOutput(prev => {
+        if (prev.length === 0) {
+          return [{ type: 'success', content: 'Code executed successfully (no output)' }];
+        }
+        return prev;
+      });
+
+    } catch (error) {
+      setOutput(prev => [...prev, { type: 'error', content: error.message }]);
+    } finally {
+      setIsRunning(false);
+      setWaitingForInput(false);
+    }
   };
+
+  const handleInputSubmit = (e) => {
+    e.preventDefault();
+    if (inputResolverRef.current && inputValue !== null) {
+      // Add user input to output
+      setOutput(prev => [...prev, { type: 'input', content: inputValue }]);
+      
+      // Resolve the promise with the input
+      inputResolverRef.current(inputValue + '\n');
+      inputResolverRef.current = null;
+      
+      // Reset state
+      setInputValue('');
+      setWaitingForInput(false);
+    }
+  };
+
+  const handleMouseDown = (e) => {
+    isDraggingRef.current = true;
+    e.preventDefault();
+  };
+
+  const handleMouseMove = (e) => {
+    if (isDraggingRef.current) {
+      e.preventDefault();
+      const newHeight = window.innerHeight - e.clientY - 26; // 26 is footer height
+      if (newHeight >= 100 && newHeight <= window.innerHeight - 200) {
+        setOutputPanelHeight(newHeight);
+      }
+    }
+  };
+
+  const handleMouseUp = () => {
+    isDraggingRef.current = false;
+  };
+
+  useEffect(() => {
+    if (isDraggingRef.current) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, []);
+
 
   const handleVisualize = async () => {
     if (!code.trim()) {
@@ -262,6 +508,49 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
           </button>
 
           <button
+            onClick={() => setOutputPanelOpen(!outputPanelOpen)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 16px',
+              borderRadius: '8px',
+              border: '1px solid rgba(168,85,247,0.3)',
+              backgroundColor: outputPanelOpen ? 'rgba(168,85,247,0.25)' : 'rgba(168,85,247,0.15)',
+              color: '#e9d5ff',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              fontFamily: 'monospace',
+              position: 'relative'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.3)';
+              e.currentTarget.style.borderColor = 'rgba(168,85,247,0.5)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = outputPanelOpen ? 'rgba(168,85,247,0.25)' : 'rgba(168,85,247,0.15)';
+              e.currentTarget.style.borderColor = 'rgba(168,85,247,0.3)';
+            }}
+          >
+            <Zap size={14} />
+            Output
+            {output.length > 0 && !outputPanelOpen && (
+              <span style={{
+                position: 'absolute',
+                top: '-4px',
+                right: '-4px',
+                backgroundColor: '#ef4444',
+                borderRadius: '50%',
+                width: '8px',
+                height: '8px',
+                boxShadow: '0 0 4px #ef4444'
+              }} />
+            )}
+          </button>
+
+          <button
             onClick={onToggleChat}
             style={{
               display: 'flex',
@@ -299,7 +588,8 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
         position: 'relative',
         overflow: 'hidden',
         transition: 'opacity 0.7s',
-        opacity: isLoaded ? 1 : 0
+        opacity: isLoaded ? 1 : 0,
+        height: outputPanelOpen ? `calc(100% - ${outputPanelHeight}px - 26px)` : 'auto'
       }}>
         <Editor
           height="100%"
@@ -415,6 +705,246 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
         </div>
       )}
 
+      {/* --- Output Panel --- */}
+      {outputPanelOpen && (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: `${outputPanelHeight}px`,
+          borderTop: '1px solid rgba(255,255,255,0.1)',
+          backgroundColor: '#0a0612',
+          flexShrink: 0
+        }}>
+          {/* Resizer Handle */}
+          <div
+            onMouseDown={handleMouseDown}
+            style={{
+              height: '4px',
+              backgroundColor: 'rgba(168,85,247,0.1)',
+              cursor: 'ns-resize',
+              transition: 'background-color 0.2s',
+              borderTop: '1px solid rgba(168,85,247,0.2)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.1)';
+            }}
+          />
+          
+          {/* Output Header */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '8px 16px',
+            borderBottom: '1px solid rgba(255,255,255,0.05)',
+            backgroundColor: '#050309'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '12px',
+              fontWeight: 600,
+              color: '#a855f7',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
+            }}>
+              <Zap size={14} />
+              <span>Output</span>
+              {isRunning && (
+                <span style={{
+                  color: '#94a3b8',
+                  fontSize: '11px',
+                  fontWeight: 400
+                }}>
+                  (Running...)
+                </span>
+              )}
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => setOutput([])}
+                style={{
+                  padding: '4px 12px',
+                  fontSize: '11px',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(168,85,247,0.2)',
+                  backgroundColor: 'rgba(168,85,247,0.1)',
+                  color: '#94a3b8',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.2)';
+                  e.currentTarget.style.color = '#e9d5ff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.1)';
+                  e.currentTarget.style.color = '#94a3b8';
+                }}
+              >
+                Clear
+              </button>
+              <button
+                onClick={() => setOutputPanelOpen(false)}
+                style={{
+                  padding: '4px 12px',
+                  fontSize: '11px',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(168,85,247,0.2)',
+                  backgroundColor: 'rgba(168,85,247,0.1)',
+                  color: '#94a3b8',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.2)';
+                  e.currentTarget.style.color = '#e9d5ff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.1)';
+                  e.currentTarget.style.color = '#94a3b8';
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+
+          {/* Output Content */}
+          <div 
+            className="output-terminal-content"
+            style={{
+              flex: 1,
+              overflow: 'auto',
+              padding: '12px 16px',
+              fontFamily: 'Consolas, monospace',
+              fontSize: '13px',
+              lineHeight: '1.6'
+            }}>
+            {output.length === 0 ? (
+              <div style={{
+                color: '#64748b',
+                fontStyle: 'italic',
+                textAlign: 'center',
+                marginTop: '20px'
+              }}>
+                No output yet. Run your code to see results.
+              </div>
+            ) : (
+              output.map((item, index) => (
+                <div
+                  key={index}
+                  style={{
+                    marginBottom: item.type === 'input' ? '4px' : '8px',
+                    padding: item.type === 'input' ? '4px 12px' : '8px 12px',
+                    borderRadius: '4px',
+                    backgroundColor: 
+                      item.type === 'error' ? 'rgba(239,68,68,0.1)' :
+                      item.type === 'stderr' ? 'rgba(251,191,36,0.1)' :
+                      item.type === 'success' ? 'rgba(34,197,94,0.1)' :
+                      item.type === 'info' ? 'rgba(59,130,246,0.1)' :
+                      item.type === 'input' ? 'rgba(139,92,246,0.15)' :
+                      'rgba(168,85,247,0.05)',
+                    borderLeft: `3px solid ${
+                      item.type === 'error' ? '#ef4444' :
+                      item.type === 'stderr' ? '#fbbf24' :
+                      item.type === 'success' ? '#22c55e' :
+                      item.type === 'info' ? '#3b82f6' :
+                      item.type === 'input' ? '#8b5cf6' :
+                      '#a855f7'
+                    }`,
+                    color: 
+                      item.type === 'error' ? '#fca5a5' :
+                      item.type === 'stderr' ? '#fcd34d' :
+                      item.type === 'success' ? '#86efac' :
+                      item.type === 'info' ? '#93c5fd' :
+                      item.type === 'input' ? '#c4b5fd' :
+                      '#e2e8f0',
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word'
+                  }}
+                >
+                  {item.type === 'input' && (
+                    <span style={{ color: '#8b5cf6', marginRight: '8px' }}>{'>'}</span>
+                  )}
+                  {item.content}
+                </div>
+              ))
+            )}
+            
+            {/* Interactive Input Field */}
+            {waitingForInput && (
+              <form onSubmit={handleInputSubmit} style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginTop: '12px',
+                padding: '8px 12px',
+                borderRadius: '4px',
+                backgroundColor: 'rgba(139,92,246,0.1)',
+                borderLeft: '3px solid #8b5cf6'
+              }}>
+                <span style={{ color: '#8b5cf6', fontWeight: 'bold' }}>{'>'}</span>
+                <input
+                  ref={inputFieldRef}
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  autoFocus
+                  style={{
+                    flex: 1,
+                    backgroundColor: 'rgba(168,85,247,0.1)',
+                    border: '1px solid rgba(168,85,247,0.3)',
+                    borderRadius: '4px',
+                    padding: '6px 12px',
+                    color: '#e2e8f0',
+                    fontFamily: 'Consolas, monospace',
+                    fontSize: '13px',
+                    outline: 'none',
+                    transition: 'all 0.2s'
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(168,85,247,0.6)';
+                    e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.15)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(168,85,247,0.3)';
+                    e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.1)';
+                  }}
+                  placeholder="Type input and press Enter..."
+                />
+                <button
+                  type="submit"
+                  style={{
+                    padding: '6px 16px',
+                    borderRadius: '4px',
+                    border: '1px solid rgba(168,85,247,0.3)',
+                    backgroundColor: 'rgba(168,85,247,0.2)',
+                    color: '#e9d5ff',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.2)';
+                  }}
+                >
+                  Send
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* --- Footer / Status Bar --- */}
       <div style={{
         display: 'flex',
@@ -430,15 +960,15 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
         flexShrink: 0
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#a855f7' }}>
+           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: pyodideReady ? '#22c55e' : '#fbbf24' }}>
              <div style={{
                height: '6px',
                width: '6px',
                borderRadius: '9999px',
-               backgroundColor: '#a855f7',
-               boxShadow: '0 0 4px #a855f7'
+               backgroundColor: pyodideReady ? '#22c55e' : '#fbbf24',
+               boxShadow: pyodideReady ? '0 0 4px #22c55e' : '0 0 4px #fbbf24'
              }} />
-             <span>CONNECTED</span>
+             <span>{pyodideReady ? 'PYTHON READY' : 'LOADING PYTHON...'}</span>
            </div>
            <span style={{ cursor: 'pointer' }}>main*</span>
         </div>
@@ -508,6 +1038,37 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
         @keyframes pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.5; }
+        }
+        
+        /* Custom scrollbar for output terminal */
+        .output-terminal-content::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        
+        .output-terminal-content::-webkit-scrollbar-track {
+          background: rgba(15, 10, 25, 0.5);
+          border-radius: 3px;
+        }
+        
+        .output-terminal-content::-webkit-scrollbar-thumb {
+          background: rgba(168, 85, 247, 0.3);
+          border-radius: 3px;
+          transition: background 0.2s;
+        }
+        
+        .output-terminal-content::-webkit-scrollbar-thumb:hover {
+          background: rgba(168, 85, 247, 0.5);
+        }
+        
+        .output-terminal-content::-webkit-scrollbar-thumb:active {
+          background: rgba(168, 85, 247, 0.7);
+        }
+        
+        /* Firefox scrollbar */
+        .output-terminal-content {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(168, 85, 247, 0.3) rgba(15, 10, 25, 0.5);
         }
       `}</style>
 
