@@ -1,47 +1,167 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Play, Pause, Square, Type, GitBranch, CheckCircle, XCircle, ChevronRight, ZoomIn, ZoomOut, Move, Code, X } from 'lucide-react';
+import ReactFlow, {
+  MiniMap,
+  Controls,
+  Background,
+  useNodesState,
+  useEdgesState,
+  MarkerType,
+  Position,
+  Handle,
+} from 'reactflow';
+import 'reactflow/dist/style.css';
 
-/* Mock Data for a simple "Is Number Prime?" algorithm 
-*/
-const INITIAL_NODES = [
-  { id: 'start', type: 'start', label: 'Start Program', code: 'main()', x: 350, y: 50 },
-  { id: 'init', type: 'process', label: 'Initialize', code: 'let n = 17;\nlet isPrime = true;', x: 350, y: 160 },
-  { id: 'loop_init', type: 'process', label: 'Loop Setup', code: 'let i = 2;', x: 350, y: 270 },
-  { id: 'condition', type: 'decision', label: 'Check Limit', code: 'i < n', x: 350, y: 380 },
-  { id: 'mod_check', type: 'decision', label: 'Check Factor', code: 'n % i === 0', x: 350, y: 550 },
-  { id: 'set_false', type: 'process', label: 'Found Factor', code: 'isPrime = false;\nbreak;', x: 600, y: 650 },
-  { id: 'increment', type: 'process', label: 'Increment', code: 'i++ ', x: 150, y: 480 },
-  { id: 'check_result', type: 'decision', label: 'Result?', code: 'if (isPrime)', x: 350, y: 750 },
-  { id: 'print_prime', type: 'io', label: 'Output True', code: 'print("Prime")', x: 200, y: 900 },
-  { id: 'print_not', type: 'io', label: 'Output False', code: 'print("Not Prime")', x: 500, y: 900 },
-  { id: 'end', type: 'end', label: 'End', code: 'return 0;', x: 350, y: 1050 },
-];
+// Custom Diamond Node for Decision
+const DiamondNode = ({ data }) => {
+  return (
+    <div style={{
+      width: '160px',
+      height: '160px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'relative',
+    }}>
+      {/* Connection handles - properly using React Flow Handle component */}
+      <Handle
+        type="target"
+        position={Position.Top}
+        style={{
+          background: '#a855f7',
+          width: '8px',
+          height: '8px',
+          border: '2px solid #0c0915',
+        }}
+      />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        id="bottom"
+        style={{
+          background: '#a855f7',
+          width: '8px',
+          height: '8px',
+          border: '2px solid #0c0915',
+        }}
+      />
+      <Handle
+        type="source"
+        position={Position.Left}
+        id="left"
+        style={{
+          background: '#a855f7',
+          width: '8px',
+          height: '8px',
+          border: '2px solid #0c0915',
+        }}
+      />
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="right"
+        style={{
+          background: '#a855f7',
+          width: '8px',
+          height: '8px',
+          border: '2px solid #0c0915',
+        }}
+      />
+      
+      <div style={{
+        width: '140px',
+        height: '140px',
+        background: 'rgba(251,191,36,0.15)',
+        border: '2px solid rgba(251,191,36,0.6)',
+        transform: 'rotate(45deg)',
+        position: 'absolute',
+        borderRadius: '8px',
+        boxShadow: '0 4px 12px rgba(251,191,36,0.2)',
+      }} />
+      <div style={{
+        position: 'relative',
+        zIndex: 1,
+        padding: '20px',
+        textAlign: 'center',
+        color: '#fde68a',
+        fontSize: '13px',
+        fontWeight: 600,
+        maxWidth: '100px',
+        wordWrap: 'break-word',
+      }}>
+        {data.label}
+      </div>
+    </div>
+  );
+};
 
-const INITIAL_EDGES = [
-  { id: 'e1', source: 'start', target: 'init' },
-  { id: 'e2', source: 'init', target: 'loop_init' },
-  { id: 'e3', source: 'loop_init', target: 'condition' },
-  { id: 'e4', source: 'condition', target: 'mod_check', label: 'True' },
-  { id: 'e5', source: 'condition', target: 'check_result', label: 'False' },
-  { id: 'e6', source: 'mod_check', target: 'set_false', label: 'True' },
-  { id: 'e7', source: 'mod_check', target: 'increment', label: 'False' },
-  { id: 'e8', source: 'increment', target: 'condition' }, // Loop back
-  { id: 'e9', source: 'set_false', target: 'check_result' },
-  { id: 'e10', source: 'check_result', target: 'print_prime', label: 'True' },
-  { id: 'e11', source: 'check_result', target: 'print_not', label: 'False' },
-  { id: 'e12', source: 'print_prime', target: 'end' },
-  { id: 'e13', source: 'print_not', target: 'end' },
-];
+// Custom Rounded Node for Input/Output
+const RoundedNode = ({ data }) => {
+  const nodeStyle = data.style || {};
+  return (
+    <div style={{
+      background: nodeStyle.background,
+      border: nodeStyle.border,
+      borderRadius: '50px',
+      padding: '12px 24px',
+      color: nodeStyle.color,
+      fontSize: '13px',
+      fontWeight: 500,
+      textAlign: 'center',
+      minWidth: '120px',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+      position: 'relative',
+    }}>
+      <Handle
+        type="target"
+        position={Position.Top}
+        style={{ background: '#a855f7', width: '8px', height: '8px' }}
+      />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        style={{ background: '#a855f7', width: '8px', height: '8px' }}
+      />
+      {data.label}
+    </div>
+  );
+};
 
-export default function CodeFlowchartViewer() {
-  const [nodes, setNodes] = useState(INITIAL_NODES);
-  const [edges, setEdges] = useState(INITIAL_EDGES);
-  const [scale, setScale] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [isDraggingCanvas, setIsDraggingCanvas] = useState(false);
-  const [draggingNode, setDraggingNode] = useState(null);
-  const [startPan, setStartPan] = useState({ x: 0, y: 0 });
-  const [selectedNode, setSelectedNode] = useState(null);
+// Custom Default Node
+const DefaultNode = ({ data }) => {
+  const nodeStyle = data.style || {};
+  return (
+    <div style={{
+      background: nodeStyle.background || 'rgba(30,22,41,0.9)',
+      border: nodeStyle.border || '2px solid rgba(168,85,247,0.3)',
+      borderRadius: '8px',
+      padding: '12px 16px',
+      color: nodeStyle.color || '#e2e8f0',
+      fontSize: '13px',
+      minWidth: '180px',
+      maxWidth: '220px',
+      fontFamily: "'Consolas', monospace",
+      boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+      position: 'relative',
+    }}>
+      <Handle
+        type="target"
+        position={Position.Top}
+        style={{ background: '#a855f7', width: '8px', height: '8px' }}
+      />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        style={{ background: '#a855f7', width: '8px', height: '8px' }}
+      />
+      {data.label}
+    </div>
+  );
+};
+
+export default function CodeFlowchartViewer({ flowchartData, isLoading }) {
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [showCodeViewer, setShowCodeViewer] = useState(false);
   const [codeViewerPos, setCodeViewerPos] = useState({ x: 50, y: 100 });
   const [isDraggingCodeViewer, setIsDraggingCodeViewer] = useState(false);
@@ -49,6 +169,13 @@ export default function CodeFlowchartViewer() {
   const [editorCode, setEditorCode] = useState('');
 
   const containerRef = useRef(null);
+
+  // Define custom node types
+  const nodeTypes = useMemo(() => ({
+    decision: DiamondNode,
+    rounded: RoundedNode,
+    default: DefaultNode,
+  }), []);
 
   // Load editor code from localStorage
   useEffect(() => {
@@ -59,85 +186,170 @@ export default function CodeFlowchartViewer() {
       }
     };
     
-    // Initial load
     loadCode();
-    
-    // Poll for updates every 500ms
     const interval = setInterval(loadCode, 500);
-    
     return () => clearInterval(interval);
   }, []);
 
-  // --- Helpers to calculate SVG paths ---
-  const getNodeCenter = (node) => {
-    // Approx dimensions based on CSS
-    const width = node.type === 'decision' ? 140 : 180;
-    const height = node.type === 'decision' ? 100 : 80;
-    return { x: node.x + width / 2, y: node.y + height / 2 };
-  };
-
-  const calculatePath = (source, target) => {
-    const s = getNodeCenter(source);
-    const t = getNodeCenter(target);
-    
-    // Simple Bezier curve for smooth flow
-    const deltaY = Math.abs(t.y - s.y);
-    const controlPointOffset = deltaY * 0.5;
-    
-    return `M ${s.x} ${s.y} C ${s.x} ${s.y + controlPointOffset}, ${t.x} ${t.y - controlPointOffset}, ${t.x} ${t.y}`;
-  };
-
-  // --- Event Handlers ---
-
-  const handleWheel = (e) => {
-    if (e.ctrlKey || e.metaKey) {
-      e.preventDefault();
-      const zoomSensitivity = 0.001;
-      const newScale = Math.min(Math.max(0.5, scale - e.deltaY * zoomSensitivity), 2);
-      setScale(newScale);
-    } else {
-       // Optional: Panning with trackpad
-       setPan(p => ({ x: p.x - e.deltaX, y: p.y - e.deltaY }));
-    }
-  };
-
-  const handleCanvasMouseDown = (e) => {
-    if (e.button === 0 && !draggingNode) { // Left click only
-      setIsDraggingCanvas(true);
-      setStartPan({ x: e.clientX - pan.x, y: e.clientY - pan.y });
-    }
-  };
-
-  const handleNodeMouseDown = (e, nodeId) => {
-    e.stopPropagation();
-    setDraggingNode(nodeId);
-    setSelectedNode(nodeId);
-  };
-
-  const handleMouseMove = (e) => {
-    if (draggingNode) {
-      const deltaX = e.movementX / scale;
-      const deltaY = e.movementY / scale;
-      
-      setNodes(nds => nds.map(n => {
-        if (n.id === draggingNode) {
-          return { ...n, x: n.x + deltaX, y: n.y + deltaY };
-        }
-        return n;
-      }));
-    } else if (isDraggingCanvas) {
-      setPan({
-        x: e.clientX - startPan.x,
-        y: e.clientY - startPan.y
+  // Convert backend data to React Flow format with proper branching layout
+  useEffect(() => {
+    if (flowchartData && flowchartData.nodes && flowchartData.edges) {
+      // Build adjacency map to understand the graph structure
+      const edgeMap = {};
+      flowchartData.edges.forEach(edge => {
+        if (!edgeMap[edge.source]) edgeMap[edge.source] = [];
+        edgeMap[edge.source].push({ target: edge.target, label: edge.label });
       });
-    }
-  };
 
-  const handleMouseUp = () => {
-    setIsDraggingCanvas(false);
-    setDraggingNode(null);
-    setIsDraggingCodeViewer(false);
-  };
+      // Calculate positions with branching support
+      const positions = {};
+      const nodeById = {};
+      flowchartData.nodes.forEach(node => {
+        nodeById[node.id] = node;
+      });
+
+      let yOffset = 80;
+      const centerX = 400;
+      const branchOffset = 300; // Horizontal offset for branches
+      const verticalSpacing = 150;
+
+      // BFS layout with branch detection
+      const visited = new Set();
+      const queue = [{ id: flowchartData.nodes[0].id, x: centerX, depth: 0 }];
+      
+      while (queue.length > 0) {
+        const { id, x, depth } = queue.shift();
+        
+        if (visited.has(id)) continue;
+        visited.add(id);
+        
+        positions[id] = { x, y: yOffset };
+        yOffset += verticalSpacing;
+
+        const children = edgeMap[id] || [];
+        const currentNode = nodeById[id];
+
+        // If this is a decision node with multiple children, branch them horizontally
+        if (currentNode && currentNode.type === 'decision' && children.length >= 2) {
+          // Sort children by label (True/False) for consistent positioning
+          const sortedChildren = children.sort((a, b) => {
+            if (a.label === 'True' || a.label === 'true') return 1; // True goes right
+            if (b.label === 'True' || b.label === 'true') return -1;
+            return 0;
+          });
+
+          sortedChildren.forEach((child, index) => {
+            if (index === 0) {
+              // First branch (usually False) - go left
+              queue.push({ id: child.target, x: x - branchOffset, depth: depth + 1 });
+            } else {
+              // Second branch (usually True) - go right
+              queue.push({ id: child.target, x: x + branchOffset, depth: depth + 1 });
+            }
+          });
+        } else {
+          // Normal sequential flow - stay centered
+          children.forEach(child => {
+            queue.push({ id: child.target, x, depth: depth + 1 });
+          });
+        }
+      }
+
+      // Create React Flow nodes with calculated positions
+      const flowNodes = flowchartData.nodes.map((node) => {
+        let nodeType = 'default';
+        let style = {
+          background: 'rgba(30,22,41,0.9)',
+          color: '#e2e8f0',
+          border: '2px solid rgba(168,85,247,0.3)',
+        };
+
+        // Customize type and styles based on node type
+        if (node.type === 'input') {
+          nodeType = 'rounded';
+          style.background = 'rgba(16,185,129,0.15)';
+          style.border = '2px solid rgba(16,185,129,0.6)';
+          style.color = '#6ee7b7';
+        } else if (node.type === 'output') {
+          nodeType = 'rounded';
+          style.background = 'rgba(239,68,68,0.15)';
+          style.border = '2px solid rgba(239,68,68,0.6)';
+          style.color = '#fca5a5';
+        } else if (node.type === 'decision') {
+          nodeType = 'decision';
+          // Decision styling is handled in DiamondNode component
+        }
+
+        return {
+          id: node.id,
+          type: nodeType,
+          data: { 
+            label: node.data.label,
+            style: style
+          },
+          position: positions[node.id] || { x: centerX, y: 0 },
+          sourcePosition: Position.Bottom,
+          targetPosition: Position.Top,
+        };
+      });
+
+      const flowEdges = flowchartData.edges.map(edge => {
+        // Determine source and target positions for better edge routing
+        const sourceNode = nodeById[edge.source];
+        const targetNode = nodeById[edge.target];
+        
+        let sourceHandle = 'bottom';
+        
+        // For decision nodes, route edges to left/right based on label
+        if (sourceNode && sourceNode.type === 'decision') {
+          const sourcePos = positions[edge.source];
+          const targetPos = positions[edge.target];
+          
+          if (targetPos && sourcePos) {
+            if (targetPos.x < sourcePos.x) {
+              sourceHandle = 'left';
+            } else if (targetPos.x > sourcePos.x) {
+              sourceHandle = 'right';
+            } else {
+              sourceHandle = 'bottom';
+            }
+          }
+        }
+
+        return {
+          id: edge.id,
+          source: edge.source,
+          target: edge.target,
+          sourceHandle: sourceHandle,
+          label: edge.label || '',
+          type: 'smoothstep',
+          animated: edge.label ? true : false,
+          style: { 
+            stroke: edge.label ? '#a855f7' : 'rgba(168,85,247,0.6)',
+            strokeWidth: 2.5
+          },
+          labelStyle: { 
+            fill: '#e9d5ff', 
+            fontSize: 12, 
+            fontWeight: 700,
+          },
+          labelBgStyle: { 
+            fill: 'rgba(10,6,18,0.95)', 
+            fillOpacity: 0.95 
+          },
+          labelBgPadding: [8, 6],
+          labelBgBorderRadius: 6,
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            color: edge.label ? '#a855f7' : 'rgba(168,85,247,0.6)',
+          },
+        };
+      });
+
+      setNodes(flowNodes);
+      setEdges(flowEdges);
+    }
+  }, [flowchartData, setNodes, setEdges]);
 
   const handleCodeViewerMouseDown = (e) => {
     e.stopPropagation();
@@ -167,18 +379,6 @@ export default function CodeFlowchartViewer() {
       };
     }
   }, [isDraggingCodeViewer, codeViewerDragStart]);
-
-  // --- Render Helpers ---
-
-  const getNodeIcon = (type) => {
-    switch(type) {
-      case 'start': return <Play size={16} />;
-      case 'end': return <Square size={16} />;
-      case 'decision': return <GitBranch size={16} />;
-      case 'io': return <Type size={16} />;
-      default: return <ChevronRight size={16} />;
-    }
-  };
 
   return (
     <div className="flowchart-app">
@@ -380,7 +580,7 @@ export default function CodeFlowchartViewer() {
         }
         .node-content {
           font-family: 'Fira Code', 'Consolas', monospace;
-          background: rgba(0,0,0,0.3);
+          background: transparent;
           padding: 6px;
           border-radius: 4px;
           font-size: 0.8rem;
@@ -515,13 +715,67 @@ export default function CodeFlowchartViewer() {
           color: #e9d5ff;
         }
 
+        /* React Flow Controls Styling */
+        .react-flow__controls {
+          background: rgba(10,6,18,0.95) !important;
+          border: 1px solid rgba(168,85,247,0.4) !important;
+          border-radius: 8px !important;
+          overflow: hidden !important;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+        }
+        .react-flow__controls-button {
+          background: transparent !important;
+          border: none !important;
+          border-bottom: 1px solid rgba(168,85,247,0.2) !important;
+          color: #cbd5e1 !important;
+          transition: all 0.2s !important;
+          width: 32px !important;
+          height: 32px !important;
+        }
+        .react-flow__controls-button:hover {
+          background: rgba(168,85,247,0.2) !important;
+          color: #e9d5ff !important;
+        }
+        .react-flow__controls-button:last-child {
+          border-bottom: none !important;
+        }
+        .react-flow__controls-button svg {
+          fill: currentColor !important;
+          width: 16px !important;
+          height: 16px !important;
+        }
+
+        /* React Flow MiniMap Styling */
+        .react-flow__minimap {
+          background: rgba(10,6,18,0.95) !important;
+          border: 2px solid rgba(168,85,247,0.4) !important;
+          border-radius: 8px !important;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+        }
+        .react-flow__minimap-mask {
+          fill: rgba(5,3,9,0.7) !important;
+        }
+        .react-flow__minimap-node {
+          fill: rgba(168,85,247,0.6) !important;
+        }
+
+        /* Fix React Flow default node backgrounds */
+        .react-flow__node {
+          background: transparent !important;
+        }
+        .react-flow__node-default {
+          background: transparent !important;
+          padding: 0 !important;
+          border: none !important;
+        }
+
       `}</style>
 
       {/* Header */}
       <div className="toolbar">
         <div className="toolbar-title">
-          <GitBranch color="#3498db" />
-          <span>CodeMap Viewer</span>
+          <GitBranch color="#a855f7" />
+          <span>Algorithm Flowchart</span>
         </div>
         <div className="toolbar-controls">
            <div className="btn" onClick={() => setShowCodeViewer(!showCodeViewer)} style={{ 
@@ -529,139 +783,125 @@ export default function CodeFlowchartViewer() {
            }}>
              <Code size={14}/> {showCodeViewer ? 'Hide' : 'Show'} Code
            </div>
-           <div className="btn" onClick={() => { setScale(1); setPan({x:0, y:0}); }}>
-             <Move size={14}/> Reset View
-           </div>
-           <div className="btn" onClick={() => setScale(s => Math.max(0.5, s - 0.1))}>
-             <ZoomOut size={14}/>
-           </div>
-           <span style={{minWidth: '40px', textAlign: 'center', fontSize: '0.9rem'}}>
-             {Math.round(scale * 100)}%
-           </span>
-           <div className="btn" onClick={() => setScale(s => Math.min(2, s + 0.1))}>
-             <ZoomIn size={14}/>
-           </div>
+           {flowchartData?.meta && (
+             <div style={{ 
+               display: 'flex', 
+               gap: '12px', 
+               fontSize: '0.85rem', 
+               color: '#94a3b8',
+               padding: '0 12px',
+               borderLeft: '1px solid rgba(255,255,255,0.1)'
+             }}>
+               <span>Time: <strong style={{color: '#e9d5ff'}}>{flowchartData.meta.timeComplexity}</strong></span>
+               <span>Space: <strong style={{color: '#e9d5ff'}}>{flowchartData.meta.spaceComplexity}</strong></span>
+             </div>
+           )}
         </div>
       </div>
 
       {/* Main Canvas */}
-      <div 
-        className="canvas-container"
-        ref={containerRef}
-        onMouseDown={handleCanvasMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
-      >
-        <div 
-          className="transform-layer"
-          style={{ 
-            transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})` 
-          }}
-        >
-          {/* Edges Layer */}
-          <svg className="connections-layer" style={{ width: 4000, height: 4000 }}>
-            <defs>
-              <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                <polygon points="0 0, 10 3.5, 0 7" fill="rgba(148,163,184,0.3)" />
-              </marker>
-              <marker id="arrowhead-active" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                <polygon points="0 0, 10 3.5, 0 7" fill="#a855f7" />
-              </marker>
-            </defs>
-            {edges.map(edge => {
-              const source = nodes.find(n => n.id === edge.source);
-              const target = nodes.find(n => n.id === edge.target);
-              if (!source || !target) return null;
-              
-              const isConnectedToSelected = selectedNode === edge.source || selectedNode === edge.target;
-              const pathD = calculatePath(source, target);
-              
-              // Calculate midpoint for label
-              const sCenter = getNodeCenter(source);
-              const tCenter = getNodeCenter(target);
-              const midX = (sCenter.x + tCenter.x) / 2;
-              const midY = (sCenter.y + tCenter.y) / 2;
-
-              return (
-                <g key={edge.id}>
-                  <path 
-                    d={pathD} 
-                    className={`connection-path ${isConnectedToSelected ? 'active' : ''}`}
-                    markerEnd={`url(#${isConnectedToSelected ? 'arrowhead-active' : 'arrowhead'})`}
-                  />
-                  {edge.label && (
-                    <g transform={`translate(${midX}, ${midY})`}>
-                       <rect x="-15" y="-10" width="30" height="20" fill="rgba(10,6,18,0.9)" rx="4" stroke="rgba(168,85,247,0.3)" strokeWidth="1" />
-                       <text x="0" y="5" textAnchor="middle" fontSize="10" fill="#cbd5e1" fontWeight="bold">
-                         {edge.label}
-                       </text>
-                    </g>
-                  )}
-                </g>
-              );
-            })}
-          </svg>
-
-          {/* Nodes Layer */}
-          {nodes.map(node => (
-            <div
-              key={node.id}
-              className={`node node-${node.type} ${selectedNode === node.id ? 'selected' : ''}`}
-              style={{ left: node.x, top: node.y }}
-              onMouseDown={(e) => handleNodeMouseDown(e, node.id)}
-            >
-              {node.type !== 'decision' && (
-                <div className="node-header">
-                  {getNodeIcon(node.type)}
-                  <span>{node.label}</span>
-                </div>
-              )}
-              <div className="node-content">
-                {node.code}
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="canvas-container" ref={containerRef}>
+        {isLoading ? (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+            gap: '16px'
+          }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              border: '4px solid rgba(168,85,247,0.2)',
+              borderTop: '4px solid #a855f7',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite'
+            }} />
+            <p style={{ color: '#94a3b8', fontSize: '14px' }}>Analyzing your code...</p>
+            <style>{`
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `}</style>
+          </div>
+        ) : !flowchartData ? (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+            gap: '12px',
+            color: '#64748b'
+          }}>
+            <GitBranch size={48} color="#475569" />
+            <p style={{ fontSize: '14px' }}>Click "Visualize" to generate flowchart</p>
+          </div>
+        ) : (
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            nodeTypes={nodeTypes}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            fitView
+            fitViewOptions={{ padding: 0.2 }}
+            minZoom={0.1}
+            maxZoom={4}
+            defaultEdgeOptions={{
+              type: 'default',
+              animated: false,
+            }}
+            style={{ background: '#0c0915' }}
+          >
+            <Background 
+              color="#a855f7" 
+              gap={20} 
+              size={1}
+              style={{ opacity: 0.08 }}
+            />
+            <Controls
+              showInteractive={false}
+              position="bottom-left"
+              style={{
+                background: 'rgba(10,6,18,0.95)',
+                border: '1px solid rgba(168,85,247,0.4)',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                bottom: '40px',
+                left: '20px',
+              }}
+            />
+            <MiniMap
+              nodeColor={(node) => {
+                if (node.type === 'decision') return 'rgba(251,191,36,0.8)';
+                if (node.type === 'rounded') {
+                  const label = node.data.label.toLowerCase();
+                  if (label.includes('start')) return 'rgba(16,185,129,0.8)';
+                  return 'rgba(239,68,68,0.8)';
+                }
+                return 'rgba(168,85,247,0.6)';
+              }}
+              maskColor="rgba(5,3,9,0.7)"
+              position="bottom-right"
+              style={{
+                background: 'rgba(10,6,18,0.95)',
+                border: '2px solid rgba(168,85,247,0.4)',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                height: 120,
+                width: 180,
+                bottom: '40px',
+                right: '20px',
+              }}
+            />
+          </ReactFlow>
+        )}
       </div>
 
-      {/* Details Panel - only if a node is selected */}
-      {selectedNode && (
-        <div className="details-panel">
-          {(() => {
-            const node = nodes.find(n => n.id === selectedNode);
-            if (!node) return null;
-            return (
-              <>
-                <div className="panel-header">
-                  {node.label}
-                </div>
-                <div className="panel-row">
-                  <div className="panel-label">Node Type</div>
-                  <div style={{ textTransform: 'capitalize' }}>{node.type}</div>
-                </div>
-                <div className="panel-row">
-                  <div className="panel-label">Execution Code</div>
-                  <div className="code-block">
-                    {node.code}
-                  </div>
-                </div>
-                <div className="panel-row">
-                  <div className="panel-label">Description</div>
-                  <div style={{ fontSize: '0.9rem', color: '#94a3b8' }}>
-                     This node represents a <strong style={{ color: '#e9d5ff' }}>{node.type}</strong> step in the algorithm. 
-                     {node.type === 'decision' ? ' It evaluates a boolean expression to branch execution.' : ' It executes a sequential instruction.'}
-                  </div>
-                </div>
-                <button className="btn" style={{width: '100%', justifyContent: 'center'}} onClick={() => setSelectedNode(null)}>
-                  Close Details
-                </button>
-              </>
-            );
-          })()}
-        </div>
-      )}
       {/* Code Viewer Panel */}
       {showCodeViewer && (
         <div 

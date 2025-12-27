@@ -69,6 +69,8 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
   const [showVisualizer, setShowVisualizer] = useState(false);
+  const [flowchartData, setFlowchartData] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
@@ -103,6 +105,39 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
   const handleRun = () => {
     console.log('Running code...');
     // Add run functionality here
+  };
+
+  const handleVisualize = async () => {
+    if (!code.trim()) {
+      alert('Please write some code first!');
+      return;
+    }
+
+    setIsGenerating(true);
+    setShowVisualizer(true);
+
+    try {
+      const response = await fetch('http://localhost:4000/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate flowchart');
+      }
+
+      const data = await response.json();
+      setFlowchartData(data);
+    } catch (error) {
+      console.error('Error generating flowchart:', error);
+      alert('Failed to generate flowchart. Make sure the backend server is running on port 4000.');
+      setShowVisualizer(false);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -196,7 +231,8 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
           </button>
 
           <button
-            onClick={() => setShowVisualizer(!showVisualizer)}
+            onClick={handleVisualize}
+            disabled={isGenerating}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -222,7 +258,7 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
             }}
           >
             <Eye size={14} />
-            Visualize
+            {isGenerating ? 'Generating...' : 'Visualize'}
           </button>
 
           <button
@@ -371,7 +407,10 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen }) {
             </button>
           </div>
           <div style={{ flex: 1, overflow: 'hidden' }}>
-            <CodeFlowChartViewer />
+            <CodeFlowChartViewer 
+              flowchartData={flowchartData}
+              isLoading={isGenerating}
+            />
           </div>
         </div>
       )}
