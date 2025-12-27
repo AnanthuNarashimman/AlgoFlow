@@ -748,7 +748,7 @@ export default function CodeFlowchartViewer({ flowchartData, isLoading }) {
         /* React Flow MiniMap Styling */
         .react-flow__minimap {
           background: rgba(10,6,18,0.95) !important;
-          border: 2px solid rgba(168,85,247,0.4) !important;
+          border: 2px solid rgba(168,85,247,0.5) !important;
           border-radius: 8px !important;
           box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
         }
@@ -856,11 +856,12 @@ export default function CodeFlowchartViewer({ flowchartData, isLoading }) {
             }}
             style={{ background: '#0c0915' }}
           >
-            <Background 
-              color="#a855f7" 
-              gap={20} 
-              size={1}
-              style={{ opacity: 0.08 }}
+            <Background
+              variant="dots"
+              color="#a855f7"
+              gap={20}
+              size={3}
+              style={{ opacity: 0.35 }}
             />
             <Controls
               showInteractive={false}
@@ -871,7 +872,7 @@ export default function CodeFlowchartViewer({ flowchartData, isLoading }) {
                 borderRadius: '8px',
                 overflow: 'hidden',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-                bottom: '40px',
+                bottom: '100px',
                 left: '20px',
               }}
             />
@@ -889,12 +890,12 @@ export default function CodeFlowchartViewer({ flowchartData, isLoading }) {
               position="bottom-right"
               style={{
                 background: 'rgba(10,6,18,0.95)',
-                border: '2px solid rgba(168,85,247,0.4)',
+                border: '2px solid rgba(168,85,247,0.5)',
                 borderRadius: '8px',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
                 height: 120,
                 width: 180,
-                bottom: '40px',
+                bottom: '100px',
                 right: '20px',
               }}
             />
