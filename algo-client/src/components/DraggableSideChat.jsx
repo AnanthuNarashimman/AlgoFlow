@@ -222,9 +222,9 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose 
         {/* Suggestion Chips */}
         <div style={{
           display: 'flex',
+          flexWrap: 'wrap',
           gap: '8px',
           padding: '12px 16px',
-          overflowX: 'auto',
           borderBottom: '1px solid rgba(255,255,255,0.03)',
           backgroundColor: 'rgba(255,255,255,0.01)',
           flexShrink: 0
