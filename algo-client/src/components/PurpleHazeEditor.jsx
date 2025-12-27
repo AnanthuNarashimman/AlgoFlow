@@ -93,7 +93,7 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChang
   const [flowchartData, setFlowchartData] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [outputPanelOpen, setOutputPanelOpen] = useState(false);
-  const [outputPanelHeight, setOutputPanelHeight] = useState(250);
+  const outputPanelHeight = 250;
   const [output, setOutput] = useState(() => {
     // Load output from sessionStorage (cleared on page close/refresh)
     const savedOutput = sessionStorage.getItem('algoflow_output');
@@ -107,7 +107,6 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChang
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
   const pyodideRef = useRef(null);
-  const isDraggingRef = useRef(false);
   const inputResolverRef = useRef(null);
   const inputFieldRef = useRef(null);
 
@@ -326,35 +325,7 @@ await __main__()
     }
   };
 
-  const handleMouseDown = (e) => {
-    isDraggingRef.current = true;
-    e.preventDefault();
-  };
 
-  const handleMouseMove = (e) => {
-    if (isDraggingRef.current) {
-      e.preventDefault();
-      const newHeight = window.innerHeight - e.clientY - 26; // 26 is footer height
-      if (newHeight >= 100 && newHeight <= window.innerHeight - 200) {
-        setOutputPanelHeight(newHeight);
-      }
-    }
-  };
-
-  const handleMouseUp = () => {
-    isDraggingRef.current = false;
-  };
-
-  useEffect(() => {
-    if (isDraggingRef.current) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, []);
 
 
   const handleVisualize = async () => {
@@ -719,24 +690,6 @@ await __main__()
           backgroundColor: '#0a0612',
           flexShrink: 0
         }}>
-          {/* Resizer Handle */}
-          <div
-            onMouseDown={handleMouseDown}
-            style={{
-              height: '4px',
-              backgroundColor: 'rgba(168,85,247,0.1)',
-              cursor: 'ns-resize',
-              transition: 'background-color 0.2s',
-              borderTop: '1px solid rgba(168,85,247,0.2)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.1)';
-            }}
-          />
-          
           {/* Output Header */}
           <div style={{
             display: 'flex',
