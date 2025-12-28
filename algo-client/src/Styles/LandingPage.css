@@ -1,0 +1,27 @@
+.landing-page {
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(180deg, #0a0a0a 0%, #1a0a2e 50%, #3d1a5c 100%);
+  color: #ffffff;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Navbar positioning adjustments */
+.landing-page .pill-nav-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  left: 0;
+}
+
+.landing-page .pill-nav {
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .landing-page .pill-nav-container {
+    width: 100%;
+    display: block;
+  }
+}
