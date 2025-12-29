@@ -16,6 +16,7 @@ function PixelTransition({
   const containerRef = useRef(null);
   const pixelGridRef = useRef(null);
   const activeRef = useRef(null);
+  const defaultRef = useRef(null);
   const delayedCallRef = useRef(null);
 
   const [isActive, setIsActive] = useState(false);
@@ -50,7 +51,8 @@ function PixelTransition({
 
     const pixelGridEl = pixelGridRef.current;
     const activeEl = activeRef.current;
-    if (!pixelGridEl || !activeEl) return;
+    const defaultEl = defaultRef.current;
+    if (!pixelGridEl || !activeEl || !defaultEl) return;
 
     const pixels = pixelGridEl.querySelectorAll('.pixelated-image-card__pixel');
     if (!pixels.length) return;
@@ -77,6 +79,7 @@ function PixelTransition({
     delayedCallRef.current = gsap.delayedCall(animationStepDuration, () => {
       activeEl.style.display = activate ? 'block' : 'none';
       activeEl.style.pointerEvents = activate ? 'none' : '';
+      defaultEl.style.display = activate ? 'none' : 'block';
     });
 
     gsap.to(pixels, {
@@ -113,7 +116,7 @@ function PixelTransition({
       onBlur={!isTouchDevice ? handleLeave : undefined}
       tabIndex={0}
     >
-      <div className="pixelated-image-card__default" aria-hidden={isActive}>
+      <div className="pixelated-image-card__default" ref={defaultRef} aria-hidden={isActive}>
         {firstContent}
       </div>
       <div className="pixelated-image-card__active" ref={activeRef} aria-hidden={!isActive}>
