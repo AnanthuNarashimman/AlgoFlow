@@ -3,8 +3,9 @@
   color: var(--color-primary, #fff);
   border-radius: 32px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  width: 180px;
-  height: 180px;
+  width: 100px;
+  height: 100px;
+  padding: 5px;
   max-width: 100%;
   position: relative;
   overflow: hidden;
@@ -52,7 +53,16 @@
 }
 
 .pixelated-image-card.active {
-  transform: scale(1.15);
+  animation: subtlePulse 2.5s ease-in-out infinite;
+}
+
+@keyframes subtlePulse {
+  0%, 100% {
+    transform: scale(1.15);
+  }
+  50% {
+    transform: scale(1.17);
+  }
 }
 
 @media (max-width: 768px) {

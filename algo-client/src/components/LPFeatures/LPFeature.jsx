@@ -6,17 +6,15 @@ import FlowVideo from "../../assets/Videos/Flow.mp4";
 
 import PixelTransition from "../PixelTransition/PixelTransition";
 
-import Chat from "../../assets/Chat.png";
-import Flow from "../../assets/Flow.png";
-import Execution from "../../assets/Execution.png";
+import { Play, MessageSquare, GitBranch } from "lucide-react";
 
 function LPFeature() {
     const [activeFeature, setActiveFeature] = useState('execution');
 
     const features = {
         execution: {
-            title: "Instant Code Execution",
-            description: "Run your algorithms in real-time, right in your browser. No setup required, just write and execute.",
+            title: "Instant Code Execution on Browser",
+            description: "Run your algorithms in real-time, right in your browser. No setup required, just write and execute the code.",
             video: ExecVideo,
             icon: (
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -65,11 +63,16 @@ function LPFeature() {
                     <div onClick={() => setActiveFeature('execution')}>
                         <PixelTransition
                             firstContent={
-                                <img
-                                    src={Execution}
-                                    alt="default pixel transition content, a cat!"
-                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                                />
+                                <div
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        display: "grid",
+                                        placeItems: "center"
+                                    }}
+                                >
+                                    <Play size={40} color="#ffffff" strokeWidth={1.5} />
+                                </div>
                             }
                             secondContent={
                                 <div
@@ -80,7 +83,7 @@ function LPFeature() {
                                         placeItems: "center"
                                     }}
                                 >
-                                    <p style={{ fontWeight: 500, fontSize: "1.5rem", color: "#ffffff", fontFamily: "Figtree" }}>Execution</p>
+                                    <p style={{ fontWeight: 500, fontSize: "1.3rem", color: "#ffffff", fontFamily: "Figtree" }}>Execute</p>
                                 </div>
                             }
                             gridSize={12}
@@ -94,11 +97,16 @@ function LPFeature() {
                     <div onClick={() => setActiveFeature('ai')}>
                         <PixelTransition
                             firstContent={
-                                <img
-                                    src={Chat}
-                                    alt="default pixel transition content, a cat!"
-                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                                />
+                                <div
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        display: "grid",
+                                        placeItems: "center"
+                                    }}
+                                >
+                                    <MessageSquare size={40} color="#ffffff" strokeWidth={1.5} />
+                                </div>
                             }
                             secondContent={
                                 <div
@@ -109,7 +117,7 @@ function LPFeature() {
                                         placeItems: "center"
                                     }}
                                 >
-                                    <p style={{ fontWeight: 500, fontSize: "1.5rem", color: "#ffffff", fontFamily: "Figtree" }}>Chat</p>
+                                    <p style={{ fontWeight: 500, fontSize: "1.3rem", color: "#ffffff", fontFamily: "Figtree" }}>Chat</p>
                                 </div>
                             }
                             gridSize={12}
@@ -123,11 +131,16 @@ function LPFeature() {
                     <div onClick={() => setActiveFeature('flowchart')}>
                         <PixelTransition
                             firstContent={
-                                <img
-                                    src={Flow}
-                                    alt="default pixel transition content, a cat!"
-                                    style={{ width: "100%", height: "100%", objectFit: "cover"}}
-                                />
+                                <div
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        display: "grid",
+                                        placeItems: "center"
+                                    }}
+                                >
+                                    <GitBranch size={40} color="#ffffff" strokeWidth={1.5} />
+                                </div>
                             }
                             secondContent={
                                 <div
@@ -138,7 +151,7 @@ function LPFeature() {
                                         placeItems: "center"
                                     }}
                                 >
-                                    <p style={{ fontWeight: 500, fontSize: "1.5rem", color: "#ffffff", fontFamily: "Figtree" }}>Flow Chart</p>
+                                    <p style={{ fontWeight: 500, fontSize: "1.3rem", color: "#ffffff", fontFamily: "Figtree" }}>Analyze</p>
                                 </div>
                             }
                             gridSize={12}

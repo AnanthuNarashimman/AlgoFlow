@@ -172,7 +172,7 @@
   backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .feature-demo::before {
@@ -205,16 +205,16 @@
     repeating-linear-gradient(
       0deg,
       transparent,
-      transparent 30px,
-      rgba(255, 255, 255, 0.2) 30px,
-      rgba(255, 255, 255, 0.2) 31px
+      transparent 50px,
+      rgba(255, 255, 255, 0.2) 50px,
+      rgba(255, 255, 255, 0.2) 51px
     ),
     repeating-linear-gradient(
       90deg,
       transparent,
-      transparent 30px,
-      rgba(255, 255, 255, 0.3) 30px,
-      rgba(255, 255, 255, 0.3) 31px
+      transparent 50px,
+      rgba(255, 255, 255, 0.3) 50px,
+      rgba(255, 255, 255, 0.3) 51px
     );
   mask-image: radial-gradient(
     ellipse 60% 50% at center,
@@ -223,8 +223,8 @@
     transparent 60%
   );
   -webkit-mask-image: radial-gradient(
-    ellipse 60% 50% at center,
-    rgba(0, 0, 0, 0.8) 0%,
+    ellipse 100% 100% at center,
+    rgba(0, 0, 0, 0.8) 30%,
     rgba(0, 0, 0, 0.4) 30%,
     transparent 60%
   );
@@ -296,6 +296,15 @@
   font-family: 'Nunito Sans', sans-serif;
   color: #888;
   margin: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideIn {
