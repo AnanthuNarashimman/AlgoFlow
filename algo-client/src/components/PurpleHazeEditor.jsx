@@ -241,22 +241,23 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChang
 
       pyodide.globals.set('js_input', inputHandler);
 
-      // Setup interactive IO
+      // Setup interactive IO and AST transformer
       await pyodide.runPythonAsync(`
 import sys
 from io import StringIO
 import builtins
+import ast
 
 class InteractiveOutput:
     def __init__(self, callback):
         self.callback = callback
         self.buffer = ""
-    
+
     def write(self, text):
         self.buffer += text
         self.callback(text)
         return len(text)
-    
+
     def flush(self):
         pass
 
@@ -272,11 +273,33 @@ async def _async_input_wrapper(prompt=""):
 
 # Make input work in async context
 builtins.input = _async_input_wrapper
+
+# AST transformer to properly await all input() calls
+class InputAwaiter(ast.NodeTransformer):
+    def visit_Call(self, node):
+        # First, visit children to handle nested calls
+        self.generic_visit(node)
+        # Check if this is a call to 'input'
+        if isinstance(node.func, ast.Name) and node.func.id == 'input':
+            # Wrap in an Await node
+            return ast.Await(value=node)
+        return node
+
+def transform_input_calls(code_str):
+    """Transform all input() calls to await input() using AST"""
+    try:
+        tree = ast.parse(code_str)
+        transformer = InputAwaiter()
+        new_tree = transformer.visit(tree)
+        ast.fix_missing_locations(new_tree)
+        return ast.unparse(new_tree)
+    except Exception as e:
+        # If AST transformation fails, return original code
+        return code_str
       `);
 
-      // Transform user code to await all input() calls
-      // This regex replaces input( with await input( but avoids already awaited calls
-      const transformedCode = code.replace(/(?<!await\s)(\b)input\s*\(/g, '$1await input(');
+      // Transform user code using Python AST to properly await all input() calls
+      const transformedCode = await pyodide.runPythonAsync(`transform_input_calls(${JSON.stringify(code)})`);
 
       // Wrap user code to make all input() calls awaitable
       const wrappedCode = `

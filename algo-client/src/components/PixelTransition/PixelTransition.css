@@ -1,0 +1,69 @@
+.pixelated-image-card {
+  background: #0A0612  ;
+  color: var(--color-primary, #fff);
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  width: 180px;
+  height: 180px;
+  max-width: 100%;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.pixelated-image-card__default,
+.pixelated-image-card__active,
+.pixelated-image-card__pixels {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.pixelated-image-card__active {
+  z-index: 2;
+}
+
+.pixelated-image-card__active {
+  display: none;
+}
+
+.pixelated-image-card__pixels {
+  pointer-events: none;
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.pixelated-image-card__pixel {
+  display: none;
+  position: absolute;
+}
+
+.pixelated-image-card:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.pixelated-image-card.active {
+  transform: scale(1.15);
+}
+
+@media (max-width: 768px) {
+  .pixelated-image-card {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pixelated-image-card {
+    width: 130px;
+    height: 130px;
+  }
+}

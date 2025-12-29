@@ -1,8 +1,9 @@
 .landing-page {
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(180deg, #0a0a0a 0%, #1a0a2e 50%, #3d1a5c 100%);
   color: #ffffff;
+  background: linear-gradient(135deg, #1a1520 0%, #1a0d28 30%, #3d1a5f 60%);
+  background-attachment: fixed;
   position: relative;
   overflow-x: hidden;
 }
