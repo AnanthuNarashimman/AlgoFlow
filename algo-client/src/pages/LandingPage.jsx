@@ -1,6 +1,7 @@
 import PillNav from "../components/LPNav/PillNav";
 import LPHero from "../components/LPHero/LPHero";
 import LPFeature from "../components/LPFeatures/LPFeature";
+import LPUse from "../components/LPUse/LPUse";
 
 import "../Styles/LandingPage.css"
 import Logo from "../assets/code.png";
@@ -29,6 +30,8 @@ function LandingPage() {
             <LPHero />
 
             <LPFeature />
+
+            <LPUse />
         </div>
     )
 }

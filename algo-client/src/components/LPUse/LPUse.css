@@ -1,0 +1,122 @@
+.lpuse-container {
+  width: 100%;
+  padding: 60px 20px;
+}
+
+.lpuse-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.lpuse-card {
+  position: relative;
+  height: 350px;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: transform 0.3s ease;
+}
+
+.lpuse-card:hover {
+  transform: translateY(-5px);
+}
+
+.lpuse-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  transition: background 0.3s ease;
+}
+
+.lpuse-card:hover .lpuse-card-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
+}
+
+.lpuse-card-title {
+  color: white;
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+  line-height: 1.3;
+  transition: all 0.3s ease;
+}
+
+.lpuse-card:hover .lpuse-card-title {
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.lpuse-card-description {
+  color: white;
+  font-size: 18px;
+  font-weight: 400;
+  text-align: center;
+  margin: 0;
+  line-height: 1.6;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  max-width: 400px;
+}
+
+.lpuse-card:hover .lpuse-card-description {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive design */
+@media (max-width: 968px) {
+  .lpuse-grid {
+    gap: 20px;
+  }
+
+  .lpuse-card {
+    height: 300px;
+  }
+
+  .lpuse-card-title {
+    font-size: 24px;
+  }
+
+  .lpuse-card:hover .lpuse-card-title {
+    font-size: 20px;
+  }
+
+  .lpuse-card-description {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .lpuse-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .lpuse-card {
+    height: 280px;
+  }
+}
