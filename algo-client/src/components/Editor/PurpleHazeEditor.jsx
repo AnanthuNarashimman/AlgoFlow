@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Zap, MessageSquare, Eye } from 'lucide-react';
+import { Zap, MessageSquare, Eye, CodeXml, Play, SquareTerminal } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import CodeFlowChartViewer from '../FlowChartViewer/CodeFlowChartViewer';
 // Purple Haze Theme Configuration for Monaco
@@ -398,12 +398,12 @@ await __main__()
           alignItems: 'center',
           gap: '12px'
         }}>
-          <Zap
+          <CodeXml
             size={20}
             color="#a855f7"
-            style={{
-              filter: 'drop-shadow(0 0 8px #a855f7)'
-            }}
+            // style={{
+            //   filter: 'drop-shadow(0 0 8px #a855f7)'
+            // }}
           />
           <span style={{
             fontSize: '14px',
@@ -453,7 +453,7 @@ await __main__()
               e.currentTarget.style.borderColor = 'rgba(168,85,247,0.3)';
             }}
           >
-            <Zap size={14} />
+            <Play size={14} />
             Run Code
           </button>
 
@@ -515,7 +515,7 @@ await __main__()
               e.currentTarget.style.borderColor = 'rgba(168,85,247,0.3)';
             }}
           >
-            <Zap size={14} />
+            <SquareTerminal size={14} />
             Output
             {output.length > 0 && !outputPanelOpen && (
               <span style={{
@@ -715,7 +715,7 @@ await __main__()
               textTransform: 'uppercase',
               letterSpacing: '0.05em'
             }}>
-              <Zap size={14} />
+              <SquareTerminal size={14} />
               <span>Output</span>
               {isRunning && (
                 <span style={{

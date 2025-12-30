@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import LearnSpace from './pages/LearnSpace/LearnSpace';
 import LandingPage from './pages/LandingPage/LandingPage';
+import Login from './components/Login/Login';
 
 function App() {
 
@@ -15,6 +16,7 @@ function App() {
         <Routes>
           <Route path='/' element={<LandingPage />} />
           <Route path="/learn-space" element={<LearnSpace />} />
+          <Route path='/login' element={<Login />} />
         </Routes>
       </BrowserRouter>
     </>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Send, GripVertical, User, Bot, 
-  Sparkles, Zap, BookOpen, HelpCircle, MoreHorizontal, Code, X, AlertCircle
+  Sparkles, Zap, BookOpen, HelpCircle, MoreHorizontal, Code, X, AlertCircle, Sparkle
 } from 'lucide-react';
 
 // Enhanced markdown-to-JSX renderer
@@ -386,18 +386,18 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose,
               justifyContent: 'center',
               border: '1px solid rgba(168, 85, 247, 0.2)'
             }}>
-              <Sparkles size={16} color="#a855f7" />
+              <Sparkle size={16} color="#a855f7" />
             </div>
             <div>
               <div style={{ 
                 fontSize: '14px', 
                 fontWeight: 600, 
                 color: '#e2e8f0',
-                fontFamily: 'Inter, sans-serif'
+                fontFamily: 'Figtree, sans-serif'
               }}>
                 ALGOFLOW AI
               </div>
-              <div style={{ fontSize: '11px', color: '#64748b' }}>
+              <div style={{ fontSize: '13px', color: '#64748b', fontFamily: 'Roboto' }}>
                 Always ready to help
               </div>
             </div>
