@@ -1,222 +1,291 @@
 .lpuse-container {
   width: 100%;
-  padding: 60px 20px;
-  font-family: 'Inter', 'Segoe UI', 'Roboto', -apple-system, sans-serif;
-  overflow: visible;
+  padding: 4rem 2rem;
 }
 
-.lpuse-heading {
-  text-align: center;
-  font-size: 55px;
-  margin-bottom: 30px;
+.lpuse-header {
+  font-size: 64px;
   font-weight: 700;
+  font-family: 'Inter', sans-serif;
   color: #ffffff;
-  margin: 0 auto 50px;
-  max-width: 1200px;
-  letter-spacing: -0.5px;
+  margin: 0 0 1rem 0;
+  text-align: center;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
-.lpuse-wrapper {
-  position: relative;
-  max-width: 1400px;
-  margin: 0 auto;
+.lpuse-subheader {
+  font-size: 24px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: 400;
+  color: #b8b8b8;
+  margin: 0 0 5rem 0;
+  text-align: center;
+  line-height: 1.5;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.lpuse-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 120px;
+.lpuse-cards {
+  display: flex;
+  gap: 1rem;
   max-width: 1400px;
   margin: 0 auto;
-  position: relative;
+  height: 450px;
 }
 
 .lpuse-card {
-  position: relative;
-  height: 280px;
-  border-radius: 12px;
+  flex: 1;
+  background: #e5e7eb;
+  border-radius: 16px;
   overflow: hidden;
+  transition: flex 0.5s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
   cursor: pointer;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  transition: transform 0.3s ease;
-  z-index: 999 !important;
+  position: relative;
 }
 
-.lpuse-card:hover {
-  transform: translateY(-5px);
-}
-
-.lpuse-card-overlay {
+.lpuse-card::before {
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.1) 0%,
-    rgba(0, 0, 0, 0.8) 100%
-  );
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: flex-start;
-  padding: 30px;
-  transition: background 0.3s ease;
+  right: 0;
+  bottom: 0;
+  background-image: var(--bg-image);
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
 }
 
-.lpuse-card:hover .lpuse-card-overlay {
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.4) 0%,
-    rgba(0, 0, 0, 0.9) 100%
+.lpuse-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.lpuse-card:hover::before,
+.lpuse-card:first-child::before {
+  opacity: 1;
+}
+
+.lpuse-card:hover::after,
+.lpuse-card:first-child::after {
+  opacity: 1;
+}
+
+.lpuse-cards:has(.lpuse-card:hover) .lpuse-card:first-child:not(:hover)::before,
+.lpuse-cards:has(.lpuse-card:hover) .lpuse-card:first-child:not(:hover)::after {
+  opacity: 0;
+}
+
+.lpuse-card:hover {
+  flex: 2.5;
+}
+
+.lpuse-card:first-child {
+  flex: 2.5;
+}
+
+.lpuse-card:first-child:not(:hover) ~ .lpuse-card:hover {
+  flex: 2.5;
+}
+
+.lpuse-cards:has(.lpuse-card:hover) .lpuse-card:first-child:not(:hover) {
+  flex: 1;
+}
+
+.lpuse-pattern {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 2;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 30px,
+      rgba(80, 60, 120, 0.5) 30px,
+      rgba(80, 60, 120, 0.5) 31px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 30px,
+      rgba(90, 70, 130, 0.5) 30px,
+      rgba(90, 70, 130, 0.5) 31px
+    );
+}
+
+.lpuse-pattern-top {
+  top: 0;
+  right: 0;
+  border-radius: 0 16px 0 0;
+  mask-image: radial-gradient(
+    circle at top right,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.5) 40%,
+    transparent 80%
   );
+  -webkit-mask-image: radial-gradient(
+    circle at top right,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.5) 40%,
+    transparent 80%
+  );
+}
+
+.lpuse-pattern-bottom {
+  bottom: 0;
+  left: 0;
+  border-radius: 0 0 0 16px;
+  mask-image: radial-gradient(
+    circle at bottom left,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.5) 40%,
+    transparent 80%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle at bottom left,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.5) 40%,
+    transparent 80%
+  );
+}
+
+.lpuse-card:hover .lpuse-pattern,
+.lpuse-card:first-child .lpuse-pattern {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.lpuse-cards:has(.lpuse-card:hover) .lpuse-card:first-child:not(:hover) .lpuse-pattern {
+  opacity: 1;
+  visibility: visible;
+}
+
+.lpuse-card-circular {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.lpuse-card:hover .lpuse-card-circular,
+.lpuse-card:first-child .lpuse-card-circular {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0.3s;
+}
+
+.lpuse-cards:has(.lpuse-card:hover) .lpuse-card:first-child:not(:hover) .lpuse-card-circular {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition-delay: 0s;
+}
+
+.lpuse-card-content {
+  padding: 2rem;
+  height: 100%;
+  position: relative;
 }
 
 .lpuse-card-title {
-  color: white;
-  font-size: 28px;
+  font-family: 'Jetbrains Mono';
+  font-size: 1.7rem;
   font-weight: 700;
-  text-align: left;
+  color: #1f2937;
   margin: 0;
-  line-height: 1.3;
-  transition: all 0.3s ease;
+  transition: opacity 0.3s ease, visibility 0.3s ease, color 0.3s ease, text-align 0.3s ease;
+  z-index: 2;
+  position: absolute;
+  bottom: 50%;
+  left: 2rem;
+  right: 2rem;
+  text-align: center;
+  opacity: 1;
+  visibility: visible;
 }
 
-.lpuse-card:hover .lpuse-card-title {
-  font-size: 26px;
-  margin-bottom: 12px;
+.lpuse-card:hover .lpuse-card-title,
+.lpuse-card:first-child .lpuse-card-title {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.lpuse-cards:has(.lpuse-card:hover) .lpuse-card:first-child:not(:hover) .lpuse-card-title {
+  color: #1f2937;
+  text-align: center;
+  opacity: 1;
+  visibility: visible;
+}
+
+.lpuse-card-expanded {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  position: absolute;
+  bottom: 5rem;
+  left: 2rem;
+  right: 2rem;
+  z-index: 2;
+}
+
+.lpuse-card:hover .lpuse-card-expanded,
+.lpuse-card:first-child .lpuse-card-expanded {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0.2s;
+}
+
+.lpuse-cards:has(.lpuse-card:hover) .lpuse-card:first-child:not(:hover) .lpuse-card-expanded {
+  opacity: 0;
+  visibility: hidden;
 }
 
 .lpuse-card-description {
-  color: rgba(255, 255, 255, 0.95);
-  font-size: 16px;
-  font-weight: 400;
-  text-align: left;
+  font-family: 'Figtree';
+  font-size: 1.45rem;
+  line-height: 1.7;
+  color: #ffffff;
   margin: 0;
-  line-height: 1.6;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.3s ease;
-  max-width: 100%;
+  font-weight: 500;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: -10% !important;
 }
 
-.lpuse-card:hover .lpuse-card-description {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.lpuse-center-background {
-  position: absolute;
-  top: 48%;
-  left: 49%;
-  transform: translate(-50%, -50%);
-  /* Controls the total size of the star pattern area */
-  width: 600px;
-  height: 600px;
-  /* Creates two layers of dots for star-like pattern */
-  background-image:
-    radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px),
-    radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px);
-  /* Controls spacing between stars (first value = spacing, second value = offset for layering) */
-  background-size: 30px 30px, 40px 40px;
-  background-position: 0 0, 15px 15px;
-  /* Controls the fade effect: 0% = center visibility, middle % = transition zone, end % = fully transparent */
-  /* Increase the percentages to make the visible area larger */
-  mask-image: radial-gradient(circle, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, transparent 80%);
-  -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, transparent 80%);
-  /* Layer order - lower than cards (999) so stars stay behind */
-  z-index: 50;
-  pointer-events: none;
-  animation: starTwinkle 4s ease-in-out infinite;
-}
-
-@keyframes starTwinkle {
-  0%, 100% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.lpuse-center-circle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 100;
-  pointer-events: auto;
-}
-
-.lpuse-circular-text {
-  width: 120px !important;
-  height: 120px !important;
-  font-family: 'Figtree', 'Inter', sans-serif !important;
-}
-
-.lpuse-circular-text span {
-  font-size: 14px !important;
-  font-family: 'Figtree', 'Inter', sans-serif !important;
-  font-weight: 700 !important;
-  color: #fff !important;
-}
-
-/* Responsive design */
-@media (max-width: 1200px) {
-  .lpuse-grid {
-    gap: 90px;
-  }
-}
-
-@media (max-width: 968px) {
-  .lpuse-grid {
-    gap: 80px;
+@media (max-width: 1024px) {
+  .lpuse-cards {
+    flex-direction: column;
+    height: auto;
   }
 
   .lpuse-card {
-    height: 260px;
+    min-height: 100px;
   }
 
-  .lpuse-card-title {
-    font-size: 24px;
-  }
-
-  .lpuse-card:hover .lpuse-card-title {
-    font-size: 20px;
-  }
-
-  .lpuse-card-description {
-    font-size: 16px;
-  }
-
-  .lpuse-circular-text {
-    width: 100px !important;
-    height: 100px !important;
-  }
-
-  .lpuse-circular-text span {
-    font-size: 12px !important;
-  }
-}
-
-@media (max-width: 768px) {
-  .lpuse-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .lpuse-card {
-    height: 250px;
-  }
-
-  .lpuse-center-circle {
-    display: none;
-  }
-
-  .lpuse-center-background {
-    display: none;
+  .lpuse-card:hover,
+  .lpuse-card:first-child {
+    flex: 1;
+    min-height: 300px;
   }
 }

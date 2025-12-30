@@ -4,64 +4,70 @@ import Grads from "../../assets/Grads.png";
 import Preps from "../../assets/Preps.png";
 import Visual from "../../assets/Visual.png";
 
+import star from "../../assets/star.png";
+
 import CircularText from '../CircularText/CircularText';
 
 function LPUse() {
-  const cards = [
+  const useCases = [
     {
       id: 1,
-      title: "Computer Science Students",
+      title: "Students",
       description: "Ace exams by seeing algorithms, not just reading them.",
       image: Students
     },
     {
       id: 2,
-      title: "Software Engineers Preparing for Interviews",
+      title: "Aspirants",
       description: "Master coding interviews with visual problem breakdowns.",
       image: Preps
     },
     {
       id: 3,
-      title: "Coding Bootcamp Grads",
+      title: "Starters",
       description: "Bridge from tutorials to real algorithmic understanding.",
       image: Grads
     },
     {
       id: 4,
-      title: "Developers Who Think Visually",
-      description: "Understand code through flowcharts, not text walls.",
+      title: "Thinkers",
+      description: "Understand code clearly through flowcharts, not text walls.",
       image: Visual
     }
   ];
 
   return (
     <div className="lpuse-container">
-      {/* <h2 className="lpuse-heading">Who AlgoFlow Is For</h2> */}
-      <div className="lpuse-wrapper">
-        <div className="lpuse-grid">
-          {cards.map((card) => (
-            <div key={card.id} className="lpuse-card" style={{ backgroundImage: `url(${card.image})` }}>
-              <div className="lpuse-card-overlay">
-                <h3 className="lpuse-card-title">{card.title}</h3>
-                <p className="lpuse-card-description">{card.description}</p>
+      <h2 className="lpuse-header">Learn your way</h2>
+      <p className="lpuse-subheader">AlgoFlow supports every step of your journey</p>
+      <div className="lpuse-cards">
+        {useCases.map((useCase) => (
+          <div
+            key={useCase.id}
+            className="lpuse-card"
+            style={{ '--bg-image': `url(${useCase.image})` }}
+          >
+            <div className="lpuse-pattern lpuse-pattern-top"></div>
+            <div className="lpuse-pattern lpuse-pattern-bottom"></div>
+            <div className="lpuse-card-circular">
+              <CircularText
+                text="YOU*YOU*YOU*YOU*YOU*YOU*"
+                onHover="speedUp"
+                spinDuration={20}
+                className="lpuse-circular-text"
+              />
+            </div>
+            <div className="lpuse-card-content">
+              <h3 className="lpuse-card-title">{useCase.title}</h3>
+              <div className="lpuse-card-expanded">
+                <p className="lpuse-card-description">{useCase.description}</p>
               </div>
             </div>
-          ))}
-        </div>
-
-        <div className="lpuse-center-background"></div>
-
-        <div className="lpuse-center-circle">
-          <CircularText
-            text="BUILT*FOR*YOU*"
-            onHover="speedUp"
-            spinDuration={20}
-            className="lpuse-circular-text"
-          />
-        </div>
+          </div>
+        ))}
       </div>
     </div>
-  );
+  )
 }
 
-export default LPUse;
+export default LPUse
