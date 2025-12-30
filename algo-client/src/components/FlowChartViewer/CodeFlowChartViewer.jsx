@@ -216,13 +216,10 @@ export default function CodeFlowchartViewer({ flowchartData, isLoading }) {
       // BFS layout with branch detection
       const visited = new Set();
       const queue = [{ id: flowchartData.nodes[0].id, x: centerX, depth: 0 }];
-      
       while (queue.length > 0) {
         const { id, x, depth } = queue.shift();
-        
         if (visited.has(id)) continue;
         visited.add(id);
-        
         positions[id] = { x, y: yOffset };
         yOffset += verticalSpacing;
 

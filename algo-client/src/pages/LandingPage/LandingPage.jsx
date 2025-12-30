@@ -1,13 +1,13 @@
-import PillNav from "../components/LPNav/PillNav";
-import LPHero from "../components/LPHero/LPHero";
-import LPFeature from "../components/LPFeatures/LPFeature";
-import LPUse from "../components/LPUse/LPUse";
-import MagicBento from "../components/MagicBento/MagicBento";
-import LPGIT from "../components/LPGit/LPGIT";
-import LPFooter from "../components/LPFooter/LPFooter";
+import LPHero from "../../components/LPHero/LPHero";
+import LPFeature from "../../components/LPFeatures/LPFeature";
+import LPUse from "../../components/LPUse/LPUse";
+import MagicBento from "../../components/MagicBento/MagicBento";
+import LPGIT from "../../components/LPGit/LPGIT";
+import LPFooter from "../../components/LPFooter/LPFooter";
+import PillNav from "../../components/LPNav/PillNav";
 
-import "../Styles/LandingPage.css"
-import Logo from "../assets/code.png";
+import "./LandingPage.css"
+import Logo from "../../assets/code.png";
 
 function LandingPage() {
     return (

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import PurpleHazeEditor from '../components/PurpleHazeEditor';
-import DraggableSideChat from '../components/DraggableSideChat';
+import PurpleHazeEditor from '../../components/Editor/PurpleHazeEditor';
+import DraggableSideChat from '../../components/ChatBot/DraggableSideChat';
 
 export default function LearnSpace() {
   const [chatWidth, setChatWidth] = useState(400);

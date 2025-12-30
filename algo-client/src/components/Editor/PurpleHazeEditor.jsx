@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Zap, MessageSquare, Eye } from 'lucide-react';
 import Editor from '@monaco-editor/react';
-import CodeFlowChartViewer from './CodeFlowChartViewer';
+import CodeFlowChartViewer from '../FlowChartViewer/CodeFlowChartViewer';
 // Purple Haze Theme Configuration for Monaco
 const PURPLE_HAZE_THEME = {
   base: 'vs-dark',

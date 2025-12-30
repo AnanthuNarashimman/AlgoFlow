@@ -4,8 +4,8 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import LearnSpace from './pages/LearnSpace';
-import LandingPage from './pages/LandingPage';
+import LearnSpace from './pages/LearnSpace/LearnSpace';
+import LandingPage from './pages/LandingPage/LandingPage';
 
 function App() {
 
