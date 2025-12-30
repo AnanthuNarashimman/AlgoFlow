@@ -1,7 +1,11 @@
 .pill-nav-container {
-  position: absolute;
+  position: fixed;
   top: 1em;
+  left: 0;
+  right: 0;
   z-index: 99;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  will-change: transform, opacity;
 }
 
 @media (max-width: 768px) {
@@ -22,6 +26,7 @@
   gap: 8px;
   box-sizing: border-box;
   font-family: 'Figtree';
+  position: relative;
 }
 
 @media (max-width: 768px) {

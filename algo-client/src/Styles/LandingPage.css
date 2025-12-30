@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+}
+
 .landing-page {
   width: 100%;
   color: #ffffff;
@@ -5,12 +9,11 @@
   position: relative;
   overflow: visible;
   padding-bottom: 0;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  perspective: 1000px;
-  -webkit-perspective: 1000px;
+}
+
+.landing-page section {
+  position: relative;
+  scroll-margin-top: 80px;
 }
 
 /* Navbar positioning adjustments */

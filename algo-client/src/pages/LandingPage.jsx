@@ -4,6 +4,7 @@ import LPFeature from "../components/LPFeatures/LPFeature";
 import LPUse from "../components/LPUse/LPUse";
 import MagicBento from "../components/MagicBento/MagicBento";
 import LPGIT from "../components/LPGit/LPGIT";
+import LPFooter from "../components/LPFooter/LPFooter";
 
 import "../Styles/LandingPage.css"
 import Logo from "../assets/code.png";
@@ -13,14 +14,14 @@ function LandingPage() {
         <div className="landing-page">
             <PillNav
                 logo={Logo}
-                logoAlt="Company Logo"
+                logoAlt="AlgoFlow Logo"
                 items={[
-                    { label: 'Home', href: '/' },
-                    { label: 'Features', href: '/features' },
-                    { label: 'Services', href: '/services' },
-                    { label: 'Contact', href: '/contact' }
+                    { label: 'Home', href: '#home' },
+                    { label: 'Features', href: '#features' },
+                    { label: 'Tech Stack', href: '#tech-stack' },
+                    { label: 'Community', href: '#community' },
+                    { label: 'Contact', href: '#contact' }
                 ]}
-                activeHref="/"
                 className="custom-nav"
                 ease="power2.easeOut"
                 baseColor="#ffffff"
@@ -29,26 +30,40 @@ function LandingPage() {
                 pillTextColor="#ffffff"
             />
 
-            <LPHero />
+            <section id="home">
+                <LPHero />
+            </section>
 
-            <LPFeature />
+            <section id="features">
+                <LPFeature />
+            </section>
 
-            <LPUse />
+            <section id="about">
+                <LPUse />
+            </section>
 
-            <MagicBento
-                textAutoHide={true}
-                enableStars={true}
-                enableSpotlight={true}
-                enableBorderGlow={true}
-                enableTilt={true}
-                enableMagnetism={true}
-                clickEffect={true}
-                spotlightRadius={300}
-                particleCount={12}
-                glowColor="132, 0, 255"
-            />
+            <section id="tech-stack">
+                <MagicBento
+                    textAutoHide={true}
+                    enableStars={true}
+                    enableSpotlight={true}
+                    enableBorderGlow={true}
+                    enableTilt={true}
+                    enableMagnetism={true}
+                    clickEffect={true}
+                    spotlightRadius={300}
+                    particleCount={12}
+                    glowColor="132, 0, 255"
+                />
+            </section>
 
-            <LPGIT />
+            <section id="community">
+                <LPGIT />
+            </section>
+
+            <section id="contact">
+                <LPFooter />
+            </section>
         </div>
     )
 }

@@ -28,6 +28,9 @@ const PillNav = ({
   const mobileMenuRef = useRef(null);
   const navItemsRef = useRef(null);
   const logoRef = useRef(null);
+  const navContainerRef = useRef(null);
+  const lastScrollY = useRef(0);
+  const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
     const layout = () => {
@@ -118,6 +121,52 @@ const PillNav = ({
 
     return () => window.removeEventListener('resize', onResize);
   }, [items, ease, initialLoadAnimation]);
+
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          const container = navContainerRef.current;
+          if (!container) return;
+
+          // Always fixed after initial offset
+          container.style.position = 'fixed';
+          container.style.top = '1em';
+
+          if (currentScrollY > lastScrollY.current && currentScrollY > 30) {
+            // Scrolling down - hide navbar
+            if (!isHidden) {
+              setIsHidden(true);
+              gsap.to(container, {
+                y: -120,
+                opacity: 0,
+                duration: 0.35,
+                ease
+              });
+            }
+          } else if (currentScrollY < lastScrollY.current) {
+            // Scrolling up - show navbar
+            if (isHidden) {
+              setIsHidden(false);
+              gsap.to(container, {
+                y: 0,
+                opacity: 1,
+                duration: 0.35,
+                ease
+              });
+            }
+          }
+          lastScrollY.current = currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isHidden, ease]);
 
   const handleEnter = i => {
     const tl = tlRefs.current[i];
@@ -223,7 +272,7 @@ const PillNav = ({
   };
 
   return (
-    <div className="pill-nav-container">
+    <div className="pill-nav-container" ref={navContainerRef}>
       <nav className={`pill-nav ${className}`} aria-label="Primary" style={cssVars}>
         {isRouterLink(items?.[0]?.href) ? (
           <Link
