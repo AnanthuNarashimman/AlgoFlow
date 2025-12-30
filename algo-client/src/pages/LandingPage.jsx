@@ -3,6 +3,7 @@ import LPHero from "../components/LPHero/LPHero";
 import LPFeature from "../components/LPFeatures/LPFeature";
 import LPUse from "../components/LPUse/LPUse";
 import MagicBento from "../components/MagicBento/MagicBento";
+import LPGIT from "../components/LPGit/LPGIT";
 
 import "../Styles/LandingPage.css"
 import Logo from "../assets/code.png";
@@ -34,7 +35,7 @@ function LandingPage() {
 
             <LPUse />
 
-            {/* <MagicBento
+            <MagicBento
                 textAutoHide={true}
                 enableStars={true}
                 enableSpotlight={true}
@@ -45,7 +46,9 @@ function LandingPage() {
                 spotlightRadius={300}
                 particleCount={12}
                 glowColor="132, 0, 255"
-            /> */}
+            />
+
+            <LPGIT />
         </div>
     )
 }
