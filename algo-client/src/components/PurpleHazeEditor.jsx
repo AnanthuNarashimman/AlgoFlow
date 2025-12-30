@@ -90,8 +90,16 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChang
   const [isLoaded, setIsLoaded] = useState(false);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
   const [showVisualizer, setShowVisualizer] = useState(false);
-  const [flowchartData, setFlowchartData] = useState(null);
+  const [flowchartData, setFlowchartData] = useState(() => {
+    // Load cached flowchart data from localStorage
+    const cached = localStorage.getItem('algoflow_flowchart_data');
+    return cached ? JSON.parse(cached) : null;
+  });
   const [isGenerating, setIsGenerating] = useState(false);
+  const [lastVisualizedCode, setLastVisualizedCode] = useState(() => {
+    // Load the code that was last used for visualization
+    return localStorage.getItem('algoflow_last_visualized_code') || '';
+  });
   const [outputPanelOpen, setOutputPanelOpen] = useState(false);
   const outputPanelHeight = 250;
   const [output, setOutput] = useState(() => {
@@ -357,6 +365,16 @@ await __main__()
       return;
     }
 
+    // Check if code hasn't changed since last visualization
+    if (code === lastVisualizedCode && flowchartData) {
+      // Use cached data - no need to make a new API call
+      console.log('Using cached flowchart data (code unchanged)');
+      setShowVisualizer(true);
+      return;
+    }
+
+    // Code has changed or no cached data exists - make a new API call
+    console.log('Code changed - generating new flowchart...');
     setIsGenerating(true);
     setShowVisualizer(true);
 
@@ -375,6 +393,11 @@ await __main__()
 
       const data = await response.json();
       setFlowchartData(data);
+
+      // Cache the flowchart data and the code used to generate it
+      localStorage.setItem('algoflow_flowchart_data', JSON.stringify(data));
+      localStorage.setItem('algoflow_last_visualized_code', code);
+      setLastVisualizedCode(code);
     } catch (error) {
       console.error('Error generating flowchart:', error);
       alert('Failed to generate flowchart. Make sure the backend server is running on port 4000.');

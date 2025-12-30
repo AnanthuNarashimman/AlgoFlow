@@ -7,7 +7,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(cors());
+app.use(cors())
 app.use(express.json());
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -87,7 +87,7 @@ app.post('/api/generate', async(req, res) => {
             return res.status(400).json({error: "No code provided"});
         }
 
-        console.log("Analuzing code...");
+        console.log("Analyzing code...");
 
         const model = genAI.getGenerativeModel({
             model: "gemini-2.5-flash-lite",
