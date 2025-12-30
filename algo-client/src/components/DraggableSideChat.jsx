@@ -395,7 +395,7 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose,
                 color: '#e2e8f0',
                 fontFamily: 'Inter, sans-serif'
               }}>
-                Purple Haze AI
+                ALGOFLOW AI
               </div>
               <div style={{ fontSize: '11px', color: '#64748b' }}>
                 Always ready to help
@@ -534,7 +534,7 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose,
                   fontFamily: 'Inter, sans-serif',
                   textAlign: msg.role === 'user' ? 'right' : 'left'
                 }}>
-                  {msg.role === 'user' ? 'You' : 'Purple Haze AI'}
+                  {msg.role === 'user' ? 'You' : 'ALGOFLOW AI'}
                 </div>
                 <div style={{
                   padding: '10px 12px',

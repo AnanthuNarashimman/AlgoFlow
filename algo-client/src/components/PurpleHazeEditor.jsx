@@ -451,7 +451,7 @@ await __main__()
             color: '#e2e8f0',
             letterSpacing: '0.05em'
           }}>
-            PURPLE HAZE EDITOR
+            ALGOFLOW EDITOR
           </span>
           <span style={{
             fontSize: '11px',
