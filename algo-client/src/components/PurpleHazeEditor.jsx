@@ -37,56 +37,16 @@ const PURPLE_HAZE_THEME = {
 
 const DEFAULT_PYTHON_CODE = `# Python Algorithm Workspace - Interactive Mode
 # Try using input() - it works just like an online compiler!
-
-def greet_user():
-    """Interactive greeting function."""
-    name = input("Enter your name: ")
-    age = input("Enter your age: ")
-    
-    print(f"\\nHello, {name}!")
-    print(f"You are {age} years old.")
-    
-    return name, age
-
-def check_prime(n):
-    """Check if a number is prime."""
-    if n < 2:
-        return False
-    
-    for i in range(2, int(n ** 0.5) + 1):
-        if n % i == 0:
-            return False
-    
-    return True
-
-def main():
-    print("=== Interactive Python Environment ===\\n")
-    
-    # Interactive greeting
-    name, age = greet_user()
-    
-    # Prime number checker
-    print("\\n--- Prime Number Checker ---")
-    num_str = input("Enter a number to check if it's prime: ")
-    number = int(num_str)
-    
-    result = check_prime(number)
-    
-    if result:
-        print(f"\\n✓ {number} is a prime number!")
-    else:
-        print(f"\\n✗ {number} is not a prime number.")
-    
-    print(f"\\nThanks for using the interactive terminal, {name}!")
-
-if __name__ == "__main__":
-    main()`;
+goodName = input("Enter your name:")
+print(f"Welcome to AlgoFlow, {goodName}")
+`;
 
 export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChange }) {
   const [code, setCode] = useState(() => {
     const savedCode = localStorage.getItem('algoflow_code');
     return savedCode || DEFAULT_PYTHON_CODE;
   });
+  
   const [isLoaded, setIsLoaded] = useState(false);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
   const [showVisualizer, setShowVisualizer] = useState(false);
@@ -111,7 +71,7 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChang
   const [pyodideReady, setPyodideReady] = useState(false);
   const [waitingForInput, setWaitingForInput] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  
+
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
   const pyodideRef = useRef(null);
@@ -157,7 +117,7 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChang
           const pyodide = await window.loadPyodide({
             indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'
           });
-          
+
           pyodideRef.current = pyodide;
           setPyodideReady(true);
           setOutput(prev => [...prev, { type: 'success', content: 'Python environment ready! Interactive mode enabled.' }]);
@@ -172,11 +132,11 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChang
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
-    
+
     // Define and apply the custom theme
     monaco.editor.defineTheme('purple-haze', PURPLE_HAZE_THEME);
     monaco.editor.setTheme('purple-haze');
-    
+
     // Track cursor position
     editor.onDidChangeCursorPosition((e) => {
       setCursorPos({
@@ -202,7 +162,7 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChang
     setIsRunning(true);
     setOutput([]);
     setWaitingForInput(false);
-    
+
     // Open panel if closed
     if (!outputPanelOpen) {
       setOutputPanelOpen(true);
@@ -210,7 +170,7 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChang
 
     try {
       const pyodide = pyodideRef.current;
-      
+
       // Set up real-time output callbacks
       const outputCallback = (text, type = 'stdout') => {
         setOutput(prev => {
@@ -236,7 +196,7 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChang
           if (prompt) {
             outputCallback(prompt, 'stdout');
           }
-          
+
           setWaitingForInput(true);
           inputResolverRef.current = resolve;
           setTimeout(() => {
@@ -345,11 +305,11 @@ await __main__()
     if (inputResolverRef.current && inputValue !== null) {
       // Add user input to output
       setOutput(prev => [...prev, { type: 'input', content: inputValue }]);
-      
+
       // Resolve the promise with the input
       inputResolverRef.current(inputValue + '\n');
       inputResolverRef.current = null;
-      
+
       // Reset state
       setInputValue('');
       setWaitingForInput(false);
@@ -420,7 +380,7 @@ await __main__()
       margin: 0,
       padding: 0
     }}>
-      
+
       {/* --- Header --- */}
       <div style={{
         display: 'flex',
@@ -438,8 +398,8 @@ await __main__()
           alignItems: 'center',
           gap: '12px'
         }}>
-          <Zap 
-            size={20} 
+          <Zap
+            size={20}
             color="#a855f7"
             style={{
               filter: 'drop-shadow(0 0 8px #a855f7)'
@@ -718,7 +678,7 @@ await __main__()
             </button>
           </div>
           <div style={{ flex: 1, overflow: 'hidden' }}>
-            <CodeFlowChartViewer 
+            <CodeFlowChartViewer
               flowchartData={flowchartData}
               isLoading={isGenerating}
             />
@@ -818,7 +778,7 @@ await __main__()
           </div>
 
           {/* Output Content */}
-          <div 
+          <div
             className="output-terminal-content"
             style={{
               flex: 1,
@@ -845,28 +805,27 @@ await __main__()
                     marginBottom: item.type === 'input' ? '4px' : '8px',
                     padding: item.type === 'input' ? '4px 12px' : '8px 12px',
                     borderRadius: '4px',
-                    backgroundColor: 
+                    backgroundColor:
                       item.type === 'error' ? 'rgba(239,68,68,0.1)' :
-                      item.type === 'stderr' ? 'rgba(251,191,36,0.1)' :
-                      item.type === 'success' ? 'rgba(34,197,94,0.1)' :
-                      item.type === 'info' ? 'rgba(59,130,246,0.1)' :
-                      item.type === 'input' ? 'rgba(139,92,246,0.15)' :
-                      'rgba(168,85,247,0.05)',
-                    borderLeft: `3px solid ${
-                      item.type === 'error' ? '#ef4444' :
-                      item.type === 'stderr' ? '#fbbf24' :
-                      item.type === 'success' ? '#22c55e' :
-                      item.type === 'info' ? '#3b82f6' :
-                      item.type === 'input' ? '#8b5cf6' :
-                      '#a855f7'
-                    }`,
-                    color: 
+                        item.type === 'stderr' ? 'rgba(251,191,36,0.1)' :
+                          item.type === 'success' ? 'rgba(34,197,94,0.1)' :
+                            item.type === 'info' ? 'rgba(59,130,246,0.1)' :
+                              item.type === 'input' ? 'rgba(139,92,246,0.15)' :
+                                'rgba(168,85,247,0.05)',
+                    borderLeft: `3px solid ${item.type === 'error' ? '#ef4444' :
+                        item.type === 'stderr' ? '#fbbf24' :
+                          item.type === 'success' ? '#22c55e' :
+                            item.type === 'info' ? '#3b82f6' :
+                              item.type === 'input' ? '#8b5cf6' :
+                                '#a855f7'
+                      }`,
+                    color:
                       item.type === 'error' ? '#fca5a5' :
-                      item.type === 'stderr' ? '#fcd34d' :
-                      item.type === 'success' ? '#86efac' :
-                      item.type === 'info' ? '#93c5fd' :
-                      item.type === 'input' ? '#c4b5fd' :
-                      '#e2e8f0',
+                        item.type === 'stderr' ? '#fcd34d' :
+                          item.type === 'success' ? '#86efac' :
+                            item.type === 'info' ? '#93c5fd' :
+                              item.type === 'input' ? '#c4b5fd' :
+                                '#e2e8f0',
                     whiteSpace: 'pre-wrap',
                     wordBreak: 'break-word'
                   }}
@@ -878,7 +837,7 @@ await __main__()
                 </div>
               ))
             )}
-            
+
             {/* Interactive Input Field */}
             {waitingForInput && (
               <form onSubmit={handleInputSubmit} style={{
@@ -963,25 +922,25 @@ await __main__()
         flexShrink: 0
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: pyodideReady ? '#22c55e' : '#fbbf24' }}>
-             <div style={{
-               height: '6px',
-               width: '6px',
-               borderRadius: '9999px',
-               backgroundColor: pyodideReady ? '#22c55e' : '#fbbf24',
-               boxShadow: pyodideReady ? '0 0 4px #22c55e' : '0 0 4px #fbbf24'
-             }} />
-             <span>{pyodideReady ? 'PYTHON READY' : 'LOADING PYTHON...'}</span>
-           </div>
-           <span style={{ cursor: 'pointer' }}>main*</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: pyodideReady ? '#22c55e' : '#fbbf24' }}>
+            <div style={{
+              height: '6px',
+              width: '6px',
+              borderRadius: '9999px',
+              backgroundColor: pyodideReady ? '#22c55e' : '#fbbf24',
+              boxShadow: pyodideReady ? '0 0 4px #22c55e' : '0 0 4px #fbbf24'
+            }} />
+            <span>{pyodideReady ? 'PYTHON READY' : 'LOADING PYTHON...'}</span>
+          </div>
+          <span style={{ cursor: 'pointer' }}>main*</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-           <span>Ln {cursorPos.line}, Col {cursorPos.col}</span>
-           <span>UTF-8</span>
-           <span>Python</span>
+          <span>Ln {cursorPos.line}, Col {cursorPos.col}</span>
+          <span>UTF-8</span>
+          <span>Python</span>
         </div>
       </div>
-      
+
       {/* Loading Overlay */}
       {!isLoaded && (
         <div style={{
@@ -995,8 +954,8 @@ await __main__()
           gap: '8px',
           backgroundColor: '#050309'
         }}>
-          <Zap 
-            size={32} 
+          <Zap
+            size={32}
             color="#a855f7"
             style={{
               animation: 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite'
