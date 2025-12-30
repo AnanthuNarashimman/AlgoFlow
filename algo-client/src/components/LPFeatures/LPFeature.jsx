@@ -15,35 +15,17 @@ function LPFeature() {
         execution: {
             title: "Instant Code Execution on Browser",
             description: "Run your algorithms in real-time, right in your browser. No setup required, just write and execute the code.",
-            video: ExecVideo,
-            icon: (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polygon points="5 3 19 12 5 21 5 3" />
-                </svg>
-            )
+            video: ExecVideo
         },
         ai: {
             title: "AI-Powered Chat Assistant",
             description: "Get intelligent help with your code. Ask questions, debug issues, and learn algorithms with AI guidance.",
-            video: ChatVideo, // placeholder
-            icon: (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
-            )
+            video: ChatVideo
         },
         flowchart: {
             title: "Visual Flowchart Generator",
             description: "Transform your code into clear flowcharts automatically. Understand complex logic at a glance.",
-            video: FlowVideo, // placeholder
-            icon: (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="12" y1="2" x2="12" y2="6" />
-                    <line x1="12" y1="18" x2="12" y2="22" />
-                    <rect x="8" y="6" width="8" height="6" rx="1" />
-                    <rect x="8" y="12" width="8" height="6" rx="1" />
-                </svg>
-            )
+            video: FlowVideo
         }
     };
 
@@ -170,22 +152,15 @@ function LPFeature() {
                         <p className="feature-demo-description">{currentFeature.description}</p>
                     </div>
                     <div className="feature-demo-media">
-                        {currentFeature.video ? (
-                            <video
-                                className="feature-demo-video"
-                                autoPlay
-                                loop
-                                muted
-                                playsInline
-                            >
-                                <source src={currentFeature.video} type="video/mp4" />
-                            </video>
-                        ) : (
-                            <div className="feature-demo-placeholder">
-                                <div className="placeholder-icon">{currentFeature.icon}</div>
-                                <p>Demo coming soon</p>
-                            </div>
-                        )}
+                        <video
+                            className="feature-demo-video"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                        >
+                            <source src={currentFeature.video} type="video/mp4" />
+                        </video>
                     </div>
                 </div>
             </div>

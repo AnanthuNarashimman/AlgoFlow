@@ -2,6 +2,7 @@ import PillNav from "../components/LPNav/PillNav";
 import LPHero from "../components/LPHero/LPHero";
 import LPFeature from "../components/LPFeatures/LPFeature";
 import LPUse from "../components/LPUse/LPUse";
+import MagicBento from "../components/MagicBento/MagicBento";
 
 import "../Styles/LandingPage.css"
 import Logo from "../assets/code.png";
@@ -32,6 +33,19 @@ function LandingPage() {
             <LPFeature />
 
             <LPUse />
+
+            {/* <MagicBento
+                textAutoHide={true}
+                enableStars={true}
+                enableSpotlight={true}
+                enableBorderGlow={true}
+                enableTilt={true}
+                enableMagnetism={true}
+                clickEffect={true}
+                spotlightRadius={300}
+                particleCount={12}
+                glowColor="132, 0, 255"
+            /> */}
         </div>
     )
 }

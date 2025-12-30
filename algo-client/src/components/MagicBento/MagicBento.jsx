@@ -2,6 +2,14 @@ import { useRef, useEffect, useCallback, useState } from 'react';
 import { gsap } from 'gsap';
 import './MagicBento.css';
 
+import CodeEx from "../../assets/CodeEx.png";
+import FlowEx from "../../assets/FlowEx1.png";
+
+import react from "../../assets/react.png";
+import node from "../../assets/node.png";
+import gemini from "../../assets/gemini.png";
+import firebase from "../../assets/firebase.png";
+
 const DEFAULT_PARTICLE_COUNT = 12;
 const DEFAULT_SPOTLIGHT_RADIUS = 300;
 const DEFAULT_GLOW_COLOR = '132, 0, 255';
@@ -10,39 +18,45 @@ const MOBILE_BREAKPOINT = 768;
 const cardData = [
   {
     color: '#060010',
-    title: 'Analytics',
-    description: 'Track user behavior',
-    label: 'Insights'
+    title: 'React',
+    description: 'Component-based UI that\'s fast and responsive',
+    label: 'Frontend Framework',
+    image: react
   },
   {
     color: '#060010',
-    title: 'Dashboard',
-    description: 'Centralized data view',
-    label: 'Overview'
+    title: 'Gemini AI',
+    description: 'Analyzes algorithms and explains complexity in real-time',
+    label: 'Code Intelligence',
+    image: gemini
   },
   {
     color: '#060010',
-    title: 'Collaboration',
-    description: 'Work together seamlessly',
-    label: 'Teamwork'
+    title: 'Pyodide',
+    description: 'Run Python algorithms directly in your browser. No backend required. No installation needed. Instant execution powered by WebAssembly.',
+    label: 'Python Execution',
+    image: CodeEx
   },
   {
     color: '#060010',
-    title: 'Automation',
-    description: 'Streamline workflows',
-    label: 'Efficiency'
+    title: 'React Flow',
+    description: 'Transforms your code into dynamic, explorable flowcharts. Zoom, pan, and understand algorithm flow visually.',
+    label: 'Interactive Visualizations',
+    image: FlowEx
   },
   {
     color: '#060010',
-    title: 'Integration',
-    description: 'Connect favorite tools',
-    label: 'Connectivity'
+    title: 'Firebase',
+    description: 'Secure user login and persistent data storage',
+    label: 'Authentication & Storage',
+    image: firebase
   },
   {
     color: '#060010',
-    title: 'Security',
-    description: 'Enterprise-grade protection',
-    label: 'Protection'
+    title: 'Node.js',
+    description: 'Powers the backend API and manages server-side operations',
+    label: 'Backend Runtime',
+    image: node
   }
 ];
 
@@ -499,6 +513,11 @@ const MagicBento = ({
         />
       )}
 
+      <div className="bento-header">
+        <h2 className="bento-heading">Built for Speed and Intelligence</h2>
+        <p className="bento-subheading">The technologies that make AlgoFlow fast, smart, and accessible</p>
+      </div>
+
       <BentoCardGrid gridRef={gridRef}>
         {cardData.map((card, index) => {
           const baseClassName = `magic-bento-card ${textAutoHide ? 'magic-bento-card--text-autohide' : ''} ${enableBorderGlow ? 'magic-bento-card--border-glow' : ''}`;
@@ -525,6 +544,11 @@ const MagicBento = ({
                 <div className="magic-bento-card__header">
                   <div className="magic-bento-card__label">{card.label}</div>
                 </div>
+                {card.image && (
+                  <div className="magic-bento-card__image">
+                    <img src={card.image} alt={card.title} style={{ borderRadius: '12px' }} />
+                  </div>
+                )}
                 <div className="magic-bento-card__content">
                   <h2 className="magic-bento-card__title">{card.title}</h2>
                   <p className="magic-bento-card__description">{card.description}</p>
@@ -648,6 +672,11 @@ const MagicBento = ({
               <div className="magic-bento-card__header">
                 <div className="magic-bento-card__label">{card.label}</div>
               </div>
+              {card.image && (
+                <div className="magic-bento-card__image">
+                  <img src={card.image} alt={card.title} style={{ borderRadius: '12px' }} />
+                </div>
+              )}
               <div className="magic-bento-card__content">
                 <h2 className="magic-bento-card__title">{card.title}</h2>
                 <p className="magic-bento-card__description">{card.description}</p>

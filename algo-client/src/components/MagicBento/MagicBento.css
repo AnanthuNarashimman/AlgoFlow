@@ -10,11 +10,39 @@
   color-scheme: light dark;
 }
 
+.bento-header {
+  text-align: center;
+  margin: 4em auto 2em;
+  max-width: 54em;
+  padding: 0 1em;
+}
+
+.bento-heading {
+  font-size: clamp(2rem, 3vw, 3.5rem);
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  color: var(--white);
+  margin: 0 0 0.5em;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.bento-subheading {
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  font-family: 'Figtree', sans-serif;
+  color: #b8b8b8;
+  margin: 0;
+  margin-bottom: 8%;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
 .card-grid {
   display: grid;
   gap: 0.5em;
   padding: 0.75em;
   max-width: 54em;
+  margin: 0 auto;
   font-size: clamp(1rem, 0.9rem + 0.5vw, 1.5rem);
 }
 
@@ -24,7 +52,7 @@
   justify-content: space-between;
   position: relative;
   aspect-ratio: 4/3;
-  min-height: 200px;
+  min-height: 230px;
   width: 100%;
   max-width: 100%;
   padding: 1.25em;
@@ -63,7 +91,12 @@
 }
 
 .magic-bento-card__label {
-  font-size: 16px;
+  font-size: 14px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: 400;
+  color: #b8b8b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .magic-bento-card__title,
@@ -73,15 +106,19 @@
 }
 
 .magic-bento-card__title {
-  font-weight: 400;
-  font-size: 16px;
-  margin: 0 0 0.25em;
+  font-weight: 700;
+  font-size: 24px;
+  font-family: 'Inter', sans-serif;
+  margin: 0 0 0.5em;
+  letter-spacing: -0.01em;
 }
 
 .magic-bento-card__description {
-  font-size: 12px;
-  line-height: 1.2;
-  opacity: 0.9;
+  font-size: 15px;
+  font-family: 'Figtree', sans-serif;
+  line-height: 1.5;
+  opacity: 0.85;
+  font-weight: 400;
 }
 
 .magic-bento-card--text-autohide .magic-bento-card__title,
@@ -214,4 +251,34 @@
 .bento-section {
   position: relative;
   user-select: none;
+}
+
+.magic-bento-card__image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 1em 0;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.magic-bento-card__image img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  max-height: 50px;
+  border-radius: 12px;
+  margin-right: 80%;
+}
+
+/* Large card images (Pyodide and React Flow) */
+.magic-bento-card:nth-child(3) .magic-bento-card__image img,
+.magic-bento-card:nth-child(4) .magic-bento-card__image img {
+  width: 80%;
+  height: 100%;
+  object-fit: cover;
+  max-height: 100%;
+  margin-right: 0;
 }
