@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { MemoryClient } = require('mem0ai');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -11,6 +12,11 @@ app.use(cors())
 app.use(express.json());
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// Debug: Check if MEM0_API_KEY is loaded
+console.log('MEM0_API_KEY loaded:', process.env.MEM0_API_KEY ? 'Yes (length: ' + process.env.MEM0_API_KEY.length + ')' : 'No - MISSING!');
+
+const memory = new MemoryClient({ apiKey: process.env.MEM0_API_KEY });
 
 const SYSTEM_PROMPT = `
 You are an expert algorithm visualizer that creates flowcharts from code.
@@ -107,29 +113,37 @@ app.post('/api/generate', async(req, res) => {
         res.json(data);
     } catch (error) {
         console.error("Server Error:", error);
-        req.status(500).json({
+        res.status(500).json({
             error: "Failed to generate flowchart",
             details: error.message
         });
     }
 });
 
-// Chat endpoint
+// Chat endpoint with Mem0 integration
 app.post('/api/chat', async (req, res) => {
     try {
-        const { code, message, conversationHistory } = req.body;
+        const { code, message, conversationHistory, userId = 'default_user' } = req.body;
 
         if (!message) {
             return res.status(400).json({ error: "No message provided" });
         }
 
-        console.log("Processing chat request...");
+        console.log("Processing chat request with Mem0...");
+
+        // Search for relevant memories from past conversations
+        const relevantMemories = await memory.search(message, {
+            user_id: userId,
+            limit: 3  // Get top 3 most relevant past interactions
+        });
+
+        console.log(`Found ${relevantMemories.length} relevant memories`);
 
         const model = genAI.getGenerativeModel({
             model: "gemini-2.5-flash-lite"
         });
 
-        // Build context with conversation history
+        // Simplified context - Mem0 handles the heavy lifting
         let contextPrompt = `You are Purple Haze AI, an expert coding assistant specialized in algorithms and Python programming.
 
 You help users by:
@@ -159,23 +173,6 @@ Response Format Guidelines:
 - Keep explanations clear but comprehensive (4-8 sentences when needed)
 - Break down complex concepts into digestible points
 - Be friendly and encouraging
-
-Example structure for bug fixes:
-## Issue Found
-Brief description of the problem
-
-**Current Code:**
-\`\`\`python
-# buggy code here
-\`\`\`
-
-**Why it's wrong:** Explanation
-
-**Fixed Code:**
-\`\`\`python
-# corrected code here
-\`\`\`
-
 `;
 
         // Add current code context if provided
@@ -183,21 +180,46 @@ Brief description of the problem
             contextPrompt += `\n\nCurrent code in editor:\n\`\`\`python\n${code}\n\`\`\`\n\n`;
         }
 
-        // Build conversation context
-        let conversationContext = contextPrompt;
+        // Add relevant memories from Mem0 (instead of full conversation history)
+        if (relevantMemories && relevantMemories.length > 0) {
+            contextPrompt += "\n\nRelevant context from previous conversations:\n";
+            relevantMemories.forEach((mem, idx) => {
+                contextPrompt += `${idx + 1}. ${mem.memory}\n`;
+            });
+            contextPrompt += "\n";
+        }
+
+        // Only add recent conversation history (last 2-3 messages) instead of all
         if (conversationHistory && conversationHistory.length > 0) {
-            conversationContext += "\n\nConversation history:\n";
-            conversationHistory.forEach(msg => {
-                conversationContext += `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.text}\n`;
+            const recentHistory = conversationHistory.slice(-3);  // Only last 3 messages
+            contextPrompt += "Recent conversation:\n";
+            recentHistory.forEach(msg => {
+                contextPrompt += `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.text}\n`;
             });
         }
 
-        conversationContext += `\n\nUser: ${message}\n\nAssistant:`;
+        contextPrompt += `\n\nUser: ${message}\n\nAssistant:`;
 
-        const result = await model.generateContent(conversationContext);
+        const result = await model.generateContent(contextPrompt);
         const responseText = result.response.text();
 
-        console.log("Chat response generated successfully!");
+        // Store this interaction in Mem0 for future reference
+        await memory.add(
+            [
+                { role: "user", content: message },
+                { role: "assistant", content: responseText }
+            ],
+            {
+                user_id: userId,
+                metadata: {
+                    has_code: !!(code && code.trim()),
+                    timestamp: new Date().toISOString(),
+                    topic: message.slice(0, 50)  // First 50 chars as topic
+                }
+            }
+        );
+
+        console.log("Chat response generated and stored in Mem0!");
         res.json({ response: responseText });
     } catch (error) {
         console.error("Chat Error:", error);
