@@ -493,6 +493,30 @@
     flex: 1;
   }
 
+  .lpuse-card:first-child {
+    min-height: 180px !important;
+  }
+
+  .lpuse-card:first-child .lpuse-card-title {
+    color: #fff;
+  }
+
+  .lpuse-cards:has(.lpuse-card:hover) .lpuse-card:first-child:not(:hover) .lpuse-card-title {
+    color: #fff;
+  }
+
+  .lpuse-card:hover {
+    flex: 1;
+  }
+
+  .lpuse-card:first-child {
+    flex: 1;
+  }
+
+  .lpuse-card:first-child:not(:hover)~.lpuse-card:hover {
+    flex: 1;
+  }
+
   .lpuse-card:first-child::before,
   .lpuse-card:first-child::after {
     opacity: 0;
