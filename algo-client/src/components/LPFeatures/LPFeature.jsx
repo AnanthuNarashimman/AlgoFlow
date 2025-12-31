@@ -14,17 +14,23 @@ function LPFeature() {
     const features = {
         execution: {
             title: "Instant Code Execution on Browser",
+            titleMobile: "Instant Code Execution",
             description: "Run your algorithms in real-time, right in your browser. No setup required, just write and execute the code.",
+            descriptionMobile: "Run algorithms in real-time. No setup required.",
             video: ExecVideo
         },
         ai: {
             title: "AI-Powered Chat Assistant",
+            titleMobile: "AI Chat Assistant",
             description: "Get intelligent help with your code. Ask questions, debug issues, and learn algorithms with AI guidance.",
+            descriptionMobile: "Get AI help with your code. Debug and learn faster.",
             video: ChatVideo
         },
         flowchart: {
             title: "Visual Flowchart Generator",
+            titleMobile: "Flowchart Generator",
             description: "Transform your code into clear flowcharts automatically. Understand complex logic at a glance.",
+            descriptionMobile: "Transform code into clear flowcharts automatically.",
             video: FlowVideo
         }
     };
@@ -35,9 +41,13 @@ function LPFeature() {
         <section className="features-section">
             <div className="feature-container">
                 <div className="feature-header">
-                    <h2 className="feature-main-title">Visualize and master.</h2>
+                    <h2 className="feature-main-title">
+                        <span className="desktop-text">Visualize and master.</span>
+                        <span className="mobile-text">Visualize & Master</span>
+                    </h2>
                     <p className="feature-tagline">
-                        Code. Flowcharts. AI. Execution.<br></br>AlgoFlow takes you from confusion to clarity.
+                        <span className="desktop-text">Code. Flowcharts. AI. Execution.<br></br>AlgoFlow takes you from confusion to clarity.</span>
+                        <span className="mobile-text">Code, visualize, and master algorithms with AI-powered tools.</span>
                     </p>
                 </div>
 
@@ -148,8 +158,14 @@ function LPFeature() {
 
                 <div className="feature-demo" key={activeFeature}>
                     <div className="feature-demo-content">
-                        <h3 className="feature-demo-title">{currentFeature.title}</h3>
-                        <p className="feature-demo-description">{currentFeature.description}</p>
+                        <h3 className="feature-demo-title">
+                            <span className="desktop-text">{currentFeature.title}</span>
+                            <span className="mobile-text">{currentFeature.titleMobile}</span>
+                        </h3>
+                        <p className="feature-demo-description">
+                            <span className="desktop-text">{currentFeature.description}</span>
+                            <span className="mobile-text">{currentFeature.descriptionMobile}</span>
+                        </p>
                     </div>
                     <div className="feature-demo-media">
                         <video

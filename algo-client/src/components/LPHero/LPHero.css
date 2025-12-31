@@ -188,23 +188,155 @@
   transform: translateY(-2px);
 }
 
+/* Mobile text visibility helpers */
+.mobile-text {
+  display: none;
+}
+
+.desktop-text {
+  display: inline;
+}
+
+.break-mobile {
+  display: inline;
+}
+
+/* Tablet and below (768px) */
 @media (max-width: 768px) {
   .hero-content {
-    padding: 2rem 1rem;
+    padding: 3rem 1.5rem;
+  }
+
+  .brand-pill {
+    padding: 0.4rem 1.2rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+
+  .brand-pill span {
+    font-size: 16px;
+  }
+
+  .hero-title {
+    font-size: 48px;
+    margin-top: 0;
+    line-height: 1.2;
+  }
+
+  .hero-subtitle {
+    font-size: 18px;
+    margin-bottom: 2rem;
   }
 
   .hero-cta {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.8rem;
+    margin-bottom: 2.5rem;
   }
 
   .cta-primary,
   .cta-secondary {
     width: 100%;
+    padding: 0.9rem 2rem;
+    font-size: 0.95rem;
   }
 
   .hero-demos {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+  }
+}
+
+/* Mobile (480px and below) */
+@media (max-width: 480px) {
+  .hero-content {
+    padding: 2rem 1rem;
+  }
+
+  .brand-pill {
+    padding: 0.35rem 1rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .brand-pill span {
+    font-size: 14px;
+    letter-spacing: 0.3px;
+  }
+
+  .hero-title {
+    font-size: 36px;
+    line-height: 1.15;
+    margin-bottom: 0.8rem;
+  }
+
+  .break-mobile {
+    display: block;
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+  }
+
+  /* Show mobile text, hide desktop text */
+  .mobile-text {
+    display: inline;
+  }
+
+  .desktop-text {
+    display: none;
+  }
+
+  .hero-cta {
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .cta-primary,
+  .cta-secondary {
+    padding: 0.85rem 1.5rem;
+    font-size: 0.9rem;
+    border-radius: 12px;
+  }
+
+  .hero-demos {
+    gap: 1.2rem;
+  }
+
+  .demo-image {
+    border-radius: 10px;
+  }
+}
+
+/* Extra small mobile (360px and below) */
+@media (max-width: 360px) {
+  .hero-content {
+    padding: 1.5rem 0.8rem;
+  }
+
+  .brand-pill span {
+    font-size: 12px;
+  }
+
+  .hero-title {
+    font-size: 28px;
+    margin-bottom: 0.6rem;
+  }
+
+  .hero-subtitle {
+    font-size: 14px;
+    margin-bottom: 1.5rem;
+  }
+
+  .cta-primary,
+  .cta-secondary {
+    padding: 0.75rem 1.2rem;
+    font-size: 0.85rem;
+  }
+
+  .hero-demos {
+    gap: 1rem;
   }
 }

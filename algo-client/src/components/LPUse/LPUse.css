@@ -273,10 +273,25 @@
   margin-bottom: -10% !important;
 }
 
+/* Desktop and Large Tablet (1024px and below) */
 @media (max-width: 1024px) {
+  .lpuse-container {
+    padding: 5rem 2rem;
+  }
+
+  .lpuse-header {
+    font-size: 52px;
+  }
+
+  .lpuse-subheader {
+    font-size: 20px;
+    margin-bottom: 4rem;
+  }
+
   .lpuse-cards {
     flex-direction: column;
     height: auto;
+    gap: 1.5rem;
   }
 
   .lpuse-card {
@@ -287,5 +302,251 @@
   .lpuse-card:first-child {
     flex: 1;
     min-height: 300px;
+  }
+
+  .lpuse-card-title {
+    font-size: 1.5rem;
+  }
+
+  .lpuse-card-description {
+    font-size: 1.3rem;
+  }
+}
+
+/* Tablet (768px and below) */
+@media (max-width: 768px) {
+  .lpuse-container {
+    padding: 4rem 1.5rem;
+  }
+
+  .lpuse-header {
+    font-size: 42px;
+    line-height: 1.2;
+  }
+
+  .lpuse-subheader {
+    font-size: 18px;
+    margin-bottom: 3rem;
+  }
+
+  .lpuse-cards {
+    gap: 1.2rem;
+  }
+
+  .lpuse-card:hover,
+  .lpuse-card:first-child {
+    min-height: 280px;
+  }
+
+  .lpuse-card-title {
+    font-size: 1.4rem;
+  }
+
+  .lpuse-card-description {
+    font-size: 1.2rem;
+    line-height: 1.6;
+  }
+
+  .lpuse-card-content {
+    padding: 1.5rem;
+  }
+
+  .lpuse-card-expanded {
+    bottom: 4rem;
+    left: 1.5rem;
+    right: 1.5rem;
+  }
+
+  .lpuse-card-title {
+    left: 1.5rem;
+    right: 1.5rem;
+  }
+}
+
+/* Mobile (480px and below) */
+@media (max-width: 480px) {
+  .lpuse-container {
+    padding: 3rem 1rem;
+  }
+
+  .lpuse-header {
+    font-size: 32px;
+    line-height: 1.2;
+    margin-bottom: 0.8rem;
+  }
+
+  .lpuse-subheader {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+  }
+
+  .lpuse-cards {
+    gap: 1rem;
+  }
+
+  .lpuse-card {
+    border-radius: 12px;
+  }
+
+  /* Reset first-child default expansion on mobile */
+  .lpuse-card:first-child {
+    flex: 1;
+  }
+
+  .lpuse-card:first-child::before,
+  .lpuse-card:first-child::after {
+    opacity: 0;
+  }
+
+  .lpuse-card:first-child .lpuse-pattern {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .lpuse-card:first-child .lpuse-card-circular {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .lpuse-card:first-child .lpuse-card-title {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .lpuse-card:first-child .lpuse-card-expanded {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .lpuse-card:hover,
+  .lpuse-card:first-child:hover {
+    min-height: 250px;
+  }
+
+  .lpuse-card-title {
+    font-size: 1.25rem;
+    left: 1.2rem;
+    right: 1.2rem;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+  }
+
+  .lpuse-card-description {
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+
+  .lpuse-card-content {
+    padding: 1.2rem;
+  }
+
+  .lpuse-card-expanded {
+    bottom: 3rem;
+    left: 1.2rem;
+    right: 1.2rem;
+  }
+
+  .lpuse-pattern {
+    width: 100px;
+    height: 100px;
+  }
+
+  .lpuse-card-circular {
+    transform: translate(40%, -40%) scale(0.85);
+  }
+}
+
+/* Extra small mobile (360px and below) */
+@media (max-width: 360px) {
+  .lpuse-container {
+    padding: 2.5rem 0.8rem;
+  }
+
+  .lpuse-header {
+    font-size: 28px;
+    margin-bottom: 0.6rem;
+  }
+
+  .lpuse-subheader {
+    font-size: 14px;
+    margin-bottom: 1.8rem;
+  }
+
+  .lpuse-cards {
+    gap: 0.8rem;
+  }
+
+  .lpuse-card {
+    border-radius: 10px;
+  }
+
+  /* Reset first-child default expansion on mobile */
+  .lpuse-card:first-child {
+    flex: 1;
+  }
+
+  .lpuse-card:first-child::before,
+  .lpuse-card:first-child::after {
+    opacity: 0;
+  }
+
+  .lpuse-card:first-child .lpuse-pattern {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .lpuse-card:first-child .lpuse-card-circular {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .lpuse-card:first-child .lpuse-card-title {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .lpuse-card:first-child .lpuse-card-expanded {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .lpuse-card:hover,
+  .lpuse-card:first-child:hover {
+    min-height: 220px;
+  }
+
+  .lpuse-card-title {
+    font-size: 1.1rem;
+    left: 1rem;
+    right: 1rem;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+  }
+
+  .lpuse-card-description {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .lpuse-card-content {
+    padding: 1rem;
+  }
+
+  .lpuse-card-expanded {
+    bottom: 2.5rem;
+    left: 1rem;
+    right: 1rem;
+  }
+
+  .lpuse-pattern {
+    width: 80px;
+    height: 80px;
+  }
+
+  .lpuse-card-circular {
+    transform: translate(35%, -35%) scale(0.75);
   }
 }

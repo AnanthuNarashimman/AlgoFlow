@@ -15,8 +15,13 @@ function LPHero() {
                     <div className="brand-pill">
                         <span>AlgoFlow</span>
                     </div>
-                    <h1 className="hero-title">Master algorithms comes <br/>from visual clarity.</h1>
-                    <p className="hero-subtitle">Stop tracing loops in your head. Start seeing them on screen.<br/>Turn complex code into clear visualizations. Learn faster, code smarter.</p>
+                    <h1 className="hero-title">
+                        Master algorithms <span className="break-mobile">from visual clarity</span>
+                    </h1>
+                    <p className="hero-subtitle">
+                        <span className="desktop-text">Stop tracing loops in your head. Start seeing them on screen. Turn complex code into clear visualizations. Learn faster, code smarter.</span>
+                        <span className="mobile-text">Visualize algorithms in real-time. Learn faster, code smarter.</span>
+                    </p>
                     <div className="hero-cta">
                         <button className="cta-primary" onClick={() => {navigate("/login")}}>Get Started</button>
                         <button className="cta-secondary">Watch Demo</button>
