@@ -44,7 +44,7 @@ function LPUse() {
         {useCases.map((useCase) => (
           <div
             key={useCase.id}
-            className="lpuse-card"
+            className={`lpuse-card ${useCase.id === 1 ? 'first-card' : ''}`}
             style={{ '--bg-image': `url(${useCase.image})` }}
           >
             <div className="lpuse-pattern lpuse-pattern-top"></div>
