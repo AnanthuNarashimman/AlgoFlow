@@ -436,6 +436,18 @@
     color: #fff;
   }
 
+  .lpuse-card:hover {
+    flex: 1;
+  }
+
+  .lpuse-card:first-child {
+    flex: 1;
+  }
+
+  .lpuse-card:first-child:not(:hover)~.lpuse-card:hover {
+    flex: 1;
+  }
+
   .lpuse-card-expanded,
   .lpuse-card-description {
     display: none !important;
