@@ -62,11 +62,45 @@
   z-index: 1;
 }
 
+.brand-pill {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  background: linear-gradient(90deg,
+      rgba(243, 213, 194, 0.15) 0%,
+      rgba(234, 207, 183, 0.15) 25%,
+      rgba(214, 200, 206, 0.15) 55%,
+      rgba(207, 195, 217, 0.15) 75%,
+      rgba(183, 179, 214, 0.15) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 0rem;
+  margin-top: 4%;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.brand-pill span {
+  font-family: 'Inter';
+  font-size: 22px;
+  font-weight: 600;
+  background: linear-gradient(90deg,
+      #f3d5c2 0%,
+      #eacfb7 25%,
+      #d6c8ce 55%,
+      #cfc3d9 75%,
+      #b7b3d6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
 .hero-title {
   font-size: 70px;
   font-weight: 600;
   margin: 0 0 1rem 0;
-  margin-top: 7%;
+  margin-top: 2%;
   font-family: 'Inter';
   background: linear-gradient(90deg,
       #f3d5c2 0%,

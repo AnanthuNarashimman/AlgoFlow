@@ -6,10 +6,13 @@ import LPGIT from "../../components/LPGit/LPGIT";
 import LPFooter from "../../components/LPFooter/LPFooter";
 import PillNav from "../../components/LPNav/PillNav";
 
+
 import "./LandingPage.css"
 import Logo from "../../assets/code.png";
 
 function LandingPage() {
+
+
     return (
         <div className="landing-page">
             <PillNav

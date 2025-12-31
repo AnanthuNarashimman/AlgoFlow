@@ -3,7 +3,7 @@
     display: flex;
     height: 100vh;
     width: 100%;
-    background: linear-gradient(135deg, #1a1520 0%, #1a0d28 30%, #3d1a5f 60%);
+    background: linear-gradient(135deg, #0d0a10 0%, #100816 30%, #2a1240 60%);
     color: #ffffff;
     overflow: hidden;
     position: relative;
@@ -16,7 +16,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: radial-gradient(circle, rgba(183, 179, 214, 0.25) 1.5px, transparent 1.5px);
+    background-image: radial-gradient(circle, rgba(183, 179, 214, 0.15) 1px, transparent 1.5px);
     background-size: 20px 20px;
     pointer-events: none;
     z-index: 2;
@@ -29,7 +29,7 @@
     position: relative;
     display: none;
     /* Hidden on mobile */
-    padding: 0px 0px;
+    padding: 0px 50px;
     align-items: center;
     justify-content: center;
     height: 100%;
@@ -50,23 +50,60 @@
 
 .image-overlay {
     position: absolute;
-    bottom: 80px;
-    left: 80px;
+    bottom: 7.5%;
+    left: 50px;
+    right: 50px;
+    padding: 60px 40px 40px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 50%, transparent 100%);
     z-index: 10;
+    border-radius: 0 0 24px 24px;
 }
 
 .image-overlay h2 {
-    font-size: 2rem;
-    margin-bottom: 10px;
-    font-weight: 600;
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    font-weight: 800;
     font-family: 'Inter', sans-serif;
+    background: linear-gradient(90deg,
+        #f3d5c2 0%,
+        #eacfb7 25%,
+        #d6c8ce 55%,
+        #cfc3d9 75%,
+        #b7b3d6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
 }
 
 .image-overlay p {
-    color: #a0a0a0;
-    max-width: 400px;
-    line-height: 1.5;
+    color: #e0e0e0;
+    max-width: 500px;
+    line-height: 1.6;
     font-family: 'Nunito Sans', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 400;
+    margin-bottom: 20px;
+}
+
+.learn-more-btn {
+    padding: 12px 28px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: 'Figtree', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.learn-more-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
 }
 
 /* Right Side - Form */
@@ -149,24 +186,24 @@
 .form-input {
     width: 100%;
     padding: 14px 16px;
-    background-color: rgba(26, 26, 26, 0.8);
-    border: 1.5px solid #444444;
+    background-color: rgba(61, 26, 95, 0.2);
+    border: 1.5px solid rgba(183, 179, 214, 0.3);
     border-radius: 8px;
     color: #ffffff;
     font-size: 1rem;
     transition: all 0.2s ease;
     outline: none;
     font-family: 'Nunito Sans', sans-serif;
+    backdrop-filter: blur(10px);
 }
 
 .form-input:focus {
-    border-color: #8b7ab8;
-    background-color: rgba(34, 34, 34, 0.9);
-    box-shadow: 0 0 0 3px rgba(139, 122, 184, 0.1);
+    border-color: rgba(183, 179, 214, 0.6);
+    background-color: rgba(61, 26, 95, 0.3);
 }
 
 .form-input::placeholder {
-    color: #666666;
+    color: #9090a0;
     font-weight: 400;
 }
 
@@ -256,19 +293,28 @@
 /* Development Notice */
 .dev-notice {
     padding: 18px 24px;
-    background-color: rgba(26, 26, 26, 0.7);
-    border: 1.5px solid #444444;
+    background-color: rgba(251, 191, 36, 0.1);
+    border: 1.5px solid rgba(251, 191, 36, 0.4);
     border-radius: 8px;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dev-notice-icon {
+    color: #fbbf24;
+    font-size: 1.25rem;
+    flex-shrink: 0;
 }
 
 .dev-notice-text {
-    color: #b8b8b8;
+    color: #fde68a;
     font-size: 0.95rem;
     line-height: 1.6;
     margin: 0;
     font-family: 'Nunito Sans', sans-serif;
     font-weight: 500;
+    text-align: left;
 }
 
 .divider {
@@ -345,7 +391,129 @@
     }
 
     .image-overlay {
-        bottom: 60px;
-        left: 60px;
+        padding: 40px 30px 30px;
+    }
+
+    .image-overlay h2 {
+        font-size: 2rem;
+    }
+
+    .image-overlay p {
+        font-size: 0.95rem;
+    }
+}
+
+/* Custom Alert Notification */
+.custom-alert {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    min-width: 320px;
+    max-width: 450px;
+    padding: 18px 24px;
+    border-radius: 12px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 10000;
+    animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+}
+
+.custom-alert.success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.25) 100%);
+    border: 1.5px solid rgba(16, 185, 129, 0.5);
+}
+
+.custom-alert.error {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.25) 100%);
+    border: 1.5px solid rgba(239, 68, 68, 0.5);
+}
+
+.alert-content {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.alert-icon {
+    flex-shrink: 0;
+}
+
+.custom-alert.success .alert-icon {
+    color: #10b981;
+}
+
+.custom-alert.error .alert-icon {
+    color: #ef4444;
+}
+
+.alert-message {
+    margin: 0;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 500;
+    font-family: 'Nunito Sans', sans-serif;
+    line-height: 1.5;
+}
+
+.alert-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4));
+    animation: progressBar 4s linear forwards;
+}
+
+.custom-alert.success .alert-progress {
+    background: linear-gradient(90deg, transparent, #10b981);
+}
+
+.custom-alert.error .alert-progress {
+    background: linear-gradient(90deg, transparent, #ef4444);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes progressBar {
+    from {
+        width: 100%;
+    }
+    to {
+        width: 0%;
+    }
+}
+
+/* Submit Button Loading State */
+.submit-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.submit-btn:disabled:hover {
+    background-color: #cccccc;
+    transform: none;
+    box-shadow: none;
+}
+
+@media (max-width: 480px) {
+    .custom-alert {
+        top: 20px;
+        right: 20px;
+        left: 20px;
+        min-width: auto;
+        max-width: none;
     }
 }

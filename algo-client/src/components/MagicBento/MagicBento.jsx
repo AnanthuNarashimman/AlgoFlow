@@ -9,6 +9,7 @@ import react from "../../assets/react.png";
 import node from "../../assets/node.png";
 import gemini from "../../assets/gemini.png";
 import firebase from "../../assets/firebase.png";
+import mem0 from "../../assets/mem0.png";
 
 const DEFAULT_PARTICLE_COUNT = 12;
 const DEFAULT_SPOTLIGHT_RADIUS = 300;
@@ -46,10 +47,10 @@ const cardData = [
   },
   {
     color: '#060010',
-    title: 'Firebase',
-    description: 'Secure user login and persistent data storage',
-    label: 'Authentication & Storage',
-    image: firebase
+    title: 'Mem0',
+    description: 'Intelligent memory layer that personalizes AI responses',
+    label: 'Personalized AI Memory',
+    image: mem0
   },
   {
     color: '#060010',
