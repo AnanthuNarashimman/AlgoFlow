@@ -46,6 +46,8 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChang
   const navigate = useNavigate();
 
   const [isMobile, setIsMobile] = useState(false);
+  const [serverStatus, setServerStatus] = useState('checking'); // 'checking', 'ready', 'error'
+  const [serverMessage, setServerMessage] = useState('Checking server...');
 
   const [code, setCode] = useState(() => {
     const savedCode = localStorage.getItem('algoflow_code');
@@ -123,6 +125,56 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChang
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Server health check
+  useEffect(() => {
+    const checkServerHealth = async () => {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const maxAttempts = 12;
+      let attempt = 0;
+
+      const ping = async () => {
+        attempt++;
+
+        try {
+          const response = await fetch(`${API_URL}/api/health`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+          });
+
+          if (response.ok) {
+            setServerStatus('ready');
+            setServerMessage('Server ready');
+            return true;
+          }
+        } catch (error) {
+          console.log(`Health check attempt ${attempt} failed:`, error.message);
+        }
+
+        // Update status message based on elapsed time
+        if (attempt <= 5) {
+          setServerMessage('Starting server...');
+        } else if (attempt <= 10) {
+          setServerMessage('Server warming up (~30s)...');
+        } else {
+          setServerMessage('Almost ready...');
+        }
+
+        // Retry logic
+        if (attempt < maxAttempts) {
+          const delay = attempt <= 5 ? 3000 : 5000;
+          setTimeout(ping, delay);
+        } else {
+          setServerStatus('error');
+          setServerMessage('Server unavailable');
+        }
+      };
+
+      ping();
+    };
+
+    checkServerHealth();
   }, []);
 
   // Initialize Pyodide
@@ -513,6 +565,35 @@ await __main__()
           }}>
             Python
           </span>
+          {/* Server Status Indicator */}
+          {serverStatus !== 'ready' && (
+            <span
+              style={{
+                fontSize: '11px',
+                color: serverStatus === 'error' ? '#fca5a5' : '#fbbf24',
+                padding: '4px 8px',
+                backgroundColor: serverStatus === 'error' ? 'rgba(239,68,68,0.15)' : 'rgba(251,191,36,0.15)',
+                borderRadius: '4px',
+                border: serverStatus === 'error' ? '1px solid rgba(239,68,68,0.3)' : '1px solid rgba(251,191,36,0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+              title={serverMessage}
+            >
+              {serverStatus === 'checking' && (
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  border: '2px solid rgba(251,191,36,0.3)',
+                  borderTopColor: '#fbbf24',
+                  borderRadius: '50%',
+                  animation: 'spin 0.8s linear infinite'
+                }} />
+              )}
+              {serverMessage}
+            </span>
+          )}
         </div>
 
         {/* Right side - Run Button */}
@@ -549,7 +630,7 @@ await __main__()
 
           <button
             onClick={handleVisualize}
-            disabled={isGenerating}
+            disabled={isGenerating || serverStatus !== 'ready'}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -558,24 +639,29 @@ await __main__()
               borderRadius: '8px',
               border: '1px solid rgba(168,85,247,0.3)',
               backgroundColor: showVisualizer ? 'rgba(168,85,247,0.25)' : 'rgba(168,85,247,0.15)',
-              color: '#e9d5ff',
+              color: serverStatus !== 'ready' ? '#64748b' : '#e9d5ff',
               fontSize: '13px',
               fontWeight: 600,
-              cursor: 'pointer',
+              cursor: serverStatus !== 'ready' ? 'not-allowed' : 'pointer',
               transition: 'all 0.2s',
-              fontFamily: 'monospace'
+              fontFamily: 'monospace',
+              opacity: serverStatus !== 'ready' ? 0.5 : 1
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.3)';
-              e.currentTarget.style.borderColor = 'rgba(168,85,247,0.5)';
+              if (serverStatus === 'ready') {
+                e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.3)';
+                e.currentTarget.style.borderColor = 'rgba(168,85,247,0.5)';
+              }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = showVisualizer ? 'rgba(168,85,247,0.25)' : 'rgba(168,85,247,0.15)';
-              e.currentTarget.style.borderColor = 'rgba(168,85,247,0.3)';
+              if (serverStatus === 'ready') {
+                e.currentTarget.style.backgroundColor = showVisualizer ? 'rgba(168,85,247,0.25)' : 'rgba(168,85,247,0.15)';
+                e.currentTarget.style.borderColor = 'rgba(168,85,247,0.3)';
+              }
             }}
           >
             <Eye size={14} />
-            {isGenerating ? 'Generating...' : 'Visualize'}
+            {isGenerating ? 'Generating...' : serverStatus !== 'ready' ? 'Server Loading...' : 'Visualize'}
           </button>
 
           <button
@@ -623,6 +709,7 @@ await __main__()
 
           <button
             onClick={onToggleChat}
+            disabled={serverStatus !== 'ready'}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -631,24 +718,29 @@ await __main__()
               borderRadius: '8px',
               border: '1px solid rgba(168,85,247,0.3)',
               backgroundColor: isChatOpen ? 'rgba(168,85,247,0.25)' : 'rgba(168,85,247,0.15)',
-              color: '#e9d5ff',
+              color: serverStatus !== 'ready' ? '#64748b' : '#e9d5ff',
               fontSize: '13px',
               fontWeight: 600,
-              cursor: 'pointer',
+              cursor: serverStatus !== 'ready' ? 'not-allowed' : 'pointer',
               transition: 'all 0.2s',
-              fontFamily: 'monospace'
+              fontFamily: 'monospace',
+              opacity: serverStatus !== 'ready' ? 0.5 : 1
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.3)';
-              e.currentTarget.style.borderColor = 'rgba(168,85,247,0.5)';
+              if (serverStatus === 'ready') {
+                e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.3)';
+                e.currentTarget.style.borderColor = 'rgba(168,85,247,0.5)';
+              }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = isChatOpen ? 'rgba(168,85,247,0.25)' : 'rgba(168,85,247,0.15)';
-              e.currentTarget.style.borderColor = 'rgba(168,85,247,0.3)';
+              if (serverStatus === 'ready') {
+                e.currentTarget.style.backgroundColor = isChatOpen ? 'rgba(168,85,247,0.25)' : 'rgba(168,85,247,0.15)';
+                e.currentTarget.style.borderColor = 'rgba(168,85,247,0.3)';
+              }
             }}
           >
             <MessageSquare size={14} />
-            AI Chat
+            {serverStatus !== 'ready' ? 'Server Loading...' : 'AI Chat'}
           </button>
 
           <button
