@@ -343,7 +343,7 @@ await __main__()
     setShowVisualizer(true);
 
     try {
-      const response = await fetch('http://localhost:4000/api/generate', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -372,8 +372,14 @@ await __main__()
   };
 
   const handleLogout = () => {
-    // Clear any user session data if needed
+    // Clear authentication data from localStorage
+    localStorage.removeItem('algoflow_user_id');
+    localStorage.removeItem('algoflow_login_time');
+
+    // Clear session storage
     sessionStorage.clear();
+
+    // Navigate to landing page
     navigate('/');
   };
 

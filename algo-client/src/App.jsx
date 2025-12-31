@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LearnSpace from './pages/LearnSpace/LearnSpace';
 import LandingPage from './pages/LandingPage/LandingPage';
 import Login from './components/Login/Login';
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 
 function App() {
 
@@ -15,7 +16,14 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<LandingPage />} />
-          <Route path="/learn-space" element={<LearnSpace />} />
+          <Route
+            path="/learn-space"
+            element={
+              <ProtectedRoute>
+                <LearnSpace />
+              </ProtectedRoute>
+            }
+          />
           <Route path='/login' element={<Login />} />
         </Routes>
       </BrowserRouter>

@@ -42,6 +42,10 @@ const Login = () => {
       const validPassword = import.meta.env.VITE_DEMO_PASSWORD;
 
       if (formData.email === validUsername && formData.password === validPassword) {
+        // Store user ID in localStorage for authentication
+        localStorage.setItem('algoflow_user_id', formData.email);
+        localStorage.setItem('algoflow_login_time', new Date().toISOString());
+
         showAlert('success', 'Login successful! Redirecting...');
         setTimeout(() => {
           navigate('/learn-space');
