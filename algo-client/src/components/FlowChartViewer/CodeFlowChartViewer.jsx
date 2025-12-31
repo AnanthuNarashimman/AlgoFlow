@@ -160,6 +160,7 @@ const DefaultNode = ({ data }) => {
 };
 
 export default function CodeFlowchartViewer({ flowchartData, isLoading }) {
+  const [isMobile, setIsMobile] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [showCodeViewer, setShowCodeViewer] = useState(false);
@@ -177,6 +178,17 @@ export default function CodeFlowchartViewer({ flowchartData, isLoading }) {
     default: DefaultNode,
   }), []);
 
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Load editor code from localStorage
   useEffect(() => {
     const loadCode = () => {
@@ -185,7 +197,7 @@ export default function CodeFlowchartViewer({ flowchartData, isLoading }) {
         setEditorCode(savedCode);
       }
     };
-    
+
     loadCode();
     const interval = setInterval(loadCode, 500);
     return () => clearInterval(interval);
@@ -376,6 +388,67 @@ export default function CodeFlowchartViewer({ flowchartData, isLoading }) {
       };
     }
   }, [isDraggingCodeViewer, codeViewerDragStart]);
+
+  // Mobile Warning Screen
+  if (isMobile) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        width: '100%',
+        backgroundColor: '#050309',
+        padding: '20px',
+        textAlign: 'center',
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+      }}>
+        <GitBranch
+          size={64}
+          color="#a855f7"
+          style={{ marginBottom: '24px' }}
+        />
+        <h1 style={{
+          fontSize: '24px',
+          fontWeight: 700,
+          color: '#e2e8f0',
+          marginBottom: '16px',
+          letterSpacing: '0.05em'
+        }}>
+          FLOWCHART VISUALIZER
+        </h1>
+        <p style={{
+          fontSize: '16px',
+          color: '#94a3b8',
+          marginBottom: '12px',
+          lineHeight: '1.6',
+          maxWidth: '400px'
+        }}>
+          Please use a laptop or desktop computer to access the Flowchart Visualizer.
+        </p>
+        <p style={{
+          fontSize: '14px',
+          color: '#64748b',
+          lineHeight: '1.6',
+          maxWidth: '400px'
+        }}>
+          Our flowchart visualization tools are optimized for larger screens to provide you with the best viewing experience.
+        </p>
+        <div style={{
+          marginTop: '32px',
+          padding: '12px 24px',
+          borderRadius: '8px',
+          border: '1px solid rgba(168,85,247,0.3)',
+          backgroundColor: 'rgba(168,85,247,0.1)',
+          fontSize: '13px',
+          color: '#a855f7'
+        }}>
+          Minimum screen width: 1024px
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flowchart-app">

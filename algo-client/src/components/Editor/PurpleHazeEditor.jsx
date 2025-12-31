@@ -45,6 +45,8 @@ print(f"Welcome to AlgoFlow, {goodName}")
 export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChange }) {
   const navigate = useNavigate();
 
+  const [isMobile, setIsMobile] = useState(false);
+
   const [code, setCode] = useState(() => {
     const savedCode = localStorage.getItem('algoflow_code');
     return savedCode || DEFAULT_PYTHON_CODE;
@@ -110,6 +112,17 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChang
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 800);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Initialize Pyodide
@@ -382,6 +395,67 @@ await __main__()
     // Navigate to landing page
     navigate('/');
   };
+
+  // Mobile Warning Screen
+  if (isMobile) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        width: '100%',
+        backgroundColor: '#050309',
+        padding: '20px',
+        textAlign: 'center',
+        fontFamily: 'monospace'
+      }}>
+        <CodeXml
+          size={64}
+          color="#a855f7"
+          style={{ marginBottom: '24px' }}
+        />
+        <h1 style={{
+          fontSize: '24px',
+          fontWeight: 700,
+          color: '#e2e8f0',
+          marginBottom: '16px',
+          letterSpacing: '0.05em'
+        }}>
+          ALGOFLOW EDITOR
+        </h1>
+        <p style={{
+          fontSize: '16px',
+          color: '#94a3b8',
+          marginBottom: '12px',
+          lineHeight: '1.6',
+          maxWidth: '400px'
+        }}>
+          Please use a laptop or desktop computer to access the AlgoFlow Editor.
+        </p>
+        <p style={{
+          fontSize: '14px',
+          color: '#64748b',
+          lineHeight: '1.6',
+          maxWidth: '400px'
+        }}>
+          Our code editor and visualization tools are optimized for larger screens to provide you with the best development experience.
+        </p>
+        <div style={{
+          marginTop: '32px',
+          padding: '12px 24px',
+          borderRadius: '8px',
+          border: '1px solid rgba(168,85,247,0.3)',
+          backgroundColor: 'rgba(168,85,247,0.1)',
+          fontSize: '13px',
+          color: '#a855f7'
+        }}>
+          Minimum screen width: 1024px
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{
