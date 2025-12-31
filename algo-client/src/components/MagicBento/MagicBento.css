@@ -151,12 +151,26 @@
     width: 100%;
     min-height: 180px;
   }
+
+  .magic-bento-card__image {
+    width: 100% !important;
+    border-radius: 20px !important;
+  }
+
+  .magic-bento-card:nth-child(3) .magic-bento-card__image img,
+  .magic-bento-card:nth-child(4) .magic-bento-card__image img {
+    object-fit: contain !important;
+    margin-right: 77% !important;
+  }
+
 }
 
 @media (min-width: 600px) {
   .card-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+
 }
 
 @media (min-width: 1024px) {
@@ -186,12 +200,10 @@
   position: absolute;
   inset: 0;
   padding: 6px;
-  background: radial-gradient(
-    var(--glow-radius) circle at var(--glow-x) var(--glow-y),
-    rgba(132, 0, 255, calc(var(--glow-intensity) * 0.8)) 0%,
-    rgba(132, 0, 255, calc(var(--glow-intensity) * 0.4)) 30%,
-    transparent 60%
-  );
+  background: radial-gradient(var(--glow-radius) circle at var(--glow-x) var(--glow-y),
+      rgba(132, 0, 255, calc(var(--glow-intensity) * 0.8)) 0%,
+      rgba(132, 0, 255, calc(var(--glow-intensity) * 0.4)) 30%,
+      transparent 60%);
   border-radius: inherit;
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,

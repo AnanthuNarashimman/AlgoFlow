@@ -11,6 +11,9 @@ import gemini from "../../assets/gemini.png";
 import firebase from "../../assets/firebase.png";
 import mem0 from "../../assets/mem0.png";
 
+import pydiode from "../../assets/pydiode.png";
+import rflow from "../../assets/r-flow.png";
+
 const DEFAULT_PARTICLE_COUNT = 12;
 const DEFAULT_SPOTLIGHT_RADIUS = 300;
 const DEFAULT_GLOW_COLOR = '132, 0, 255';
@@ -521,6 +524,16 @@ const MagicBento = ({
 
       <BentoCardGrid gridRef={gridRef}>
         {cardData.map((card, index) => {
+          // Use mobile-friendly logos for Pyodide and React Flow on mobile
+          let cardImage = card.image;
+          if (isMobile) {
+            if (card.title === 'Pyodide') {
+              cardImage = pydiode;
+            } else if (card.title === 'React Flow') {
+              cardImage = rflow;
+            }
+          }
+
           const baseClassName = `magic-bento-card ${textAutoHide ? 'magic-bento-card--text-autohide' : ''} ${enableBorderGlow ? 'magic-bento-card--border-glow' : ''}`;
           const cardProps = {
             className: baseClassName,
@@ -545,9 +558,9 @@ const MagicBento = ({
                 <div className="magic-bento-card__header">
                   <div className="magic-bento-card__label">{card.label}</div>
                 </div>
-                {card.image && (
+                {cardImage && (
                   <div className="magic-bento-card__image">
-                    <img src={card.image} alt={card.title} style={{ borderRadius: '12px' }} />
+                    <img src={cardImage} alt={card.title} style={{ borderRadius: '12px' }} />
                   </div>
                 )}
                 <div className="magic-bento-card__content">
@@ -673,9 +686,9 @@ const MagicBento = ({
               <div className="magic-bento-card__header">
                 <div className="magic-bento-card__label">{card.label}</div>
               </div>
-              {card.image && (
+              {cardImage && (
                 <div className="magic-bento-card__image">
-                  <img src={card.image} alt={card.title} style={{ borderRadius: '12px' }} />
+                  <img src={cardImage} alt={card.title} style={{ borderRadius: '12px' }} />
                 </div>
               )}
               <div className="magic-bento-card__content">
