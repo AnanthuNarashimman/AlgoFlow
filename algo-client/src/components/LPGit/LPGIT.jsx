@@ -3,11 +3,11 @@ import "./LPGIT.css";
 
 function LPGIT() {
     const handleGitHubClick = () => {
-        window.open('https://github.com/yourusername/algoflow', '_blank');
+        window.open('https://github.com/AnanthuNarashimman/AlgoFlow', '_blank');
     };
 
     const handleContributeClick = () => {
-        window.open('https://github.com/yourusername/algoflow/blob/main/CONTRIBUTING.md', '_blank');
+        window.open('https://github.com/AnanthuNarashimman/AlgoFlow', '_blank');
     };
 
     return (
