@@ -16,6 +16,11 @@ app.use(express.json());
 app.use('/api/generate', generateRoute);
 app.use('/api/chat', chatRoute);
 
+// Health check endpoint for monitoring server status
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Start server
 app.listen(config.port, () => {
     console.log(`AlgoFlow Backend running on http://localhost:${config.port}`);
