@@ -59,9 +59,6 @@ function LPUse() {
             </div>
             <div className="lpuse-card-content">
               <h3 className="lpuse-card-title">{useCase.title}</h3>
-              <div className="lpuse-card-expanded">
-                <p className="lpuse-card-description">{useCase.description}</p>
-              </div>
             </div>
           </div>
         ))}

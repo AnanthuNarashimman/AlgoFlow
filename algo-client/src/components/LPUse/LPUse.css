@@ -83,11 +83,6 @@
   opacity: 1;
 }
 
-.lpuse-cards:has(.lpuse-card:hover) .lpuse-card:first-child:not(:hover)::before,
-.lpuse-cards:has(.lpuse-card:hover) .lpuse-card:first-child:not(:hover)::after {
-  opacity: 0;
-}
-
 .lpuse-card:hover {
   flex: 2.5;
 }
@@ -171,11 +166,6 @@
   visibility: hidden;
 }
 
-.lpuse-cards:has(.lpuse-card:hover) .lpuse-card:first-child:not(:hover) .lpuse-pattern {
-  opacity: 1;
-  visibility: visible;
-}
-
 .lpuse-card-circular {
   position: absolute;
   top: 0;
@@ -226,19 +216,6 @@
   visibility: visible;
 }
 
-.lpuse-card:hover .lpuse-card-title,
-.lpuse-card:first-child .lpuse-card-title {
-  opacity: 0;
-  visibility: hidden;
-}
-
-.lpuse-cards:has(.lpuse-card:hover) .lpuse-card:first-child:not(:hover) .lpuse-card-title {
-  color: #1f2937;
-  text-align: center;
-  opacity: 1;
-  visibility: visible;
-}
-
 .lpuse-card-expanded {
   opacity: 0;
   visibility: hidden;
@@ -255,11 +232,6 @@
   opacity: 1;
   visibility: visible;
   transition-delay: 0.2s;
-}
-
-.lpuse-cards:has(.lpuse-card:hover) .lpuse-card:first-child:not(:hover) .lpuse-card-expanded {
-  opacity: 0;
-  visibility: hidden;
 }
 
 .lpuse-card-description {
@@ -408,13 +380,18 @@
   }
 
   .lpuse-card .lpuse-card-title {
-    opacity: 0;
-    visibility: hidden;
+    opacity: 1;
+    visibility: visible;
+    top: 550%;
+    left: -55%;
+    transform: none;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   }
 
   .lpuse-card .lpuse-card-expanded {
-    opacity: 1;
-    visibility: visible;
+    opacity: 0;
+    visibility: hidden;
   }
 
   .lpuse-card-title {
@@ -473,10 +450,21 @@
     min-height: 220px;
   }
 
-  .lpuse-card-title {
+  .lpuse-card .lpuse-card-title {
+    opacity: 1;
+    visibility: visible;
+    bottom: 1.5rem;
+    transform: none;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     font-size: 1.1rem;
     left: 1rem;
     right: 1rem;
+  }
+
+  .lpuse-card .lpuse-card-expanded {
+    opacity: 0;
+    visibility: hidden;
   }
 
   .lpuse-card-description {
