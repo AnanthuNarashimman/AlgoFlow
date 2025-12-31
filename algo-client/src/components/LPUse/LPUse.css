@@ -331,6 +331,18 @@
     font-size: 1.4rem;
   }
 
+  .lpuse-card:first-child {
+    flex: 1;
+  }
+
+  .lpuse-card:hover {
+    flex: 1 !important;
+  }
+
+  .lpuse-card:first-child:not(:hover)~.lpuse-card:hover {
+    flex: 1;
+  }
+
   .lpuse-card-description {
     font-size: 1.2rem;
     line-height: 1.6;
@@ -490,7 +502,7 @@
 
   /* Reset first-child default expansion on mobile */
   .lpuse-card:first-child {
-    flex: 1;
+    flex: 1 !important;
   }
 
   .lpuse-card:first-child {
@@ -506,15 +518,15 @@
   }
 
   .lpuse-card:hover {
-    flex: 1;
+    flex: 1 !important;
   }
 
   .lpuse-card:first-child {
-    flex: 1;
+    flex: 1 !important;
   }
 
   .lpuse-card:first-child:not(:hover)~.lpuse-card:hover {
-    flex: 1;
+    flex: 1 !important;
   }
 
   .lpuse-card:first-child::before,
@@ -542,16 +554,16 @@
     visibility: hidden;
   }
 
-  .lpuse-card:hover,
+  /* .lpuse-card:hover,
   .lpuse-card:first-child:hover {
     min-height: 220px;
-  }
+  } */
 
   .lpuse-card-title {
     font-size: 1.1rem;
-    left: 1rem;
+    left: -5%;
     right: 1rem;
-    top: 50%;
+    top: 130% !important;
     bottom: auto;
     transform: translateY(-50%);
   }
