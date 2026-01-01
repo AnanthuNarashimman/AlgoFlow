@@ -93,7 +93,35 @@ Whether you're debugging a recursive function or learning data structures, AlgoF
 
 ---
 
-## 🛠️ Tech Stack
+## � Screenshots
+
+<div align="center">
+
+### 🏠 Landing Page
+
+![Landing Page](image-1.png)
+
+### 💻 Code Editor
+
+![Code Editor](./screenshots/editor.png)
+*Monaco Editor with syntax highlighting and split-view flowchart rendering*
+
+### 📊 Flowchart Visualization
+
+![Flowchart](./screenshots/flowchart.png)
+*Interactive flowchart generated from code with zoom and pan controls*
+
+### 🤖 AI Chatbot
+
+![AI Chatbot](./screenshots/chatbot.png)
+*Intelligent AI tutor with Mem0-powered memory for personalized learning*
+
+
+</div>
+
+---
+
+## �🛠️ Tech Stack
 
 ### Frontend (`algo-client`)
 
@@ -352,6 +380,26 @@ npm run dev
 | **API Keys** | Never expose API keys in frontend code—always use environment variables |
 | **Health Check** | Use `/api/health` endpoint to monitor server status |
 | **Production** | Consider upgrading to paid plans for better performance |
+
+---
+
+## 🏗️ System Architecture
+
+<div align="center">
+
+### Architecture Diagram
+
+
+</div>
+
+> **Note:** Create your architecture diagram using [Excalidraw](https://excalidraw.com/) and save it to `diagrams/architecture.png`
+>
+> **Diagram should include:**
+> - Frontend components (React, Vite, Monaco Editor, React Flow)
+> - Backend services (Express, Gemini AI, Mem0)
+> - API endpoints and data flow
+> - Authentication flow
+> - Database/Storage (if applicable)
 
 ---
 
