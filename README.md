@@ -5,7 +5,6 @@
 ![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen?style=for-the-badge&logo=node.js)
 ![React](https://img.shields.io/badge/React-19.2.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Express](https://img.shields.io/badge/Express-5.2.1-000000?style=for-the-badge&logo=express&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
 ![Vite](https://img.shields.io/badge/Vite-7.2.4-646CFF?style=flat-square&logo=vite&logoColor=white)
 ![Monaco Editor](https://img.shields.io/badge/Monaco_Editor-4.7.0-0078D4?style=flat-square&logo=visual-studio-code&logoColor=white)
@@ -21,7 +20,7 @@
 
 *An intelligent coding companion that transforms your code into interactive flowcharts in real-time. Designed for students, developers, and visual learners—bridging the gap between abstract logic and clear understanding through the power of AI.*
 
-[🚀 Live Demo](#) • [📖 Documentation](#-table-of-contents) • [🤝 Contributing](#-contributing)
+[🚀 Live Demo](https://algo-flow-roan.vercel.app)
 
 </div>
 
@@ -174,7 +173,9 @@ Before you begin, ensure you have the following installed:
 | **Google Gemini API Key** | - | [Get API Key](https://aistudio.google.com/apikey) |
 | **Mem0 API Key** | - | [Get API Key](https://app.mem0.ai/) |
 
----### Step 1: Clone the Repository
+---
+
+### Step 1: Clone the Repository
 
 ```bash
 git clone https://github.com/yourusername/AlgoFlow.git
@@ -208,7 +209,9 @@ npm start
 
 ✅ Server will run on `http://localhost:4000`
 
----### Step 3: Frontend Setup
+---
+
+### Step 3: Frontend Setup
 
 Open a new terminal and navigate to the client directory:
 
@@ -231,7 +234,9 @@ npm run dev
 
 ✅ Frontend will run on `http://localhost:5173`
 
----### Step 4: Verify Setup
+---
+
+### Step 4: Verify Setup
 
 <div align="center">
 
@@ -537,39 +542,9 @@ We welcome contributions from the community! Here's how you can help:
 
 ---
 
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
-Created as part of the **Google Tech Sprint Hackathon** 🎓
-
----
-
-## 🙏 Acknowledgments
-
 <div align="center">
 
-**Built with amazing technologies:**
-
-[![Google Gemini](https://img.shields.io/badge/Google_Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
-[![Mem0](https://img.shields.io/badge/Mem0-FF6B6B?style=for-the-badge)](https://mem0.ai/)
-[![React Flow](https://img.shields.io/badge/React_Flow-FF0072?style=for-the-badge)](https://reactflow.dev/)
-[![Monaco Editor](https://img.shields.io/badge/Monaco_Editor-0078D4?style=for-the-badge&logo=visual-studio-code)](https://microsoft.github.io/monaco-editor/)
-
-**Special Thanks:**
-- Google Gemini API for AI-powered code analysis
-- Mem0 for intelligent memory systems
-- React Flow for beautiful flowchart rendering
-- Monaco Editor for the VS Code editing experience
-- The open-source community for amazing tools
-
-</div>
-
----
-
-<div align="center">
-
-**Made with ❤️ by the AlgoFlow Team**
+**Made with ❤️ for Learners**
 
 [⬆ Back to Top](#algoflow-)
 
