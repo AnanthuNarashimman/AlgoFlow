@@ -1,4 +1,4 @@
-# AlgoFlow 🚀
+# AlgoFlow </>
 
 <div align="center">
 
@@ -99,22 +99,21 @@ Whether you're debugging a recursive function or learning data structures, AlgoF
 
 ### 🏠 Landing Page
 
-![Landing Page](image-1.png)
+<img width="1699" height="879" alt="image" src="https://github.com/user-attachments/assets/a60097ca-925a-4478-854e-09c540490fa3" />
 
 ### 💻 Code Editor
 
-![Code Editor](./screenshots/editor.png)
-*Monaco Editor with syntax highlighting and split-view flowchart rendering*
+<img width="1699" height="879" alt="image" src="https://github.com/user-attachments/assets/7f261ba4-4c58-4877-84ba-338bddfe846b" />
+
 
 ### 📊 Flowchart Visualization
 
-![Flowchart](./screenshots/flowchart.png)
-*Interactive flowchart generated from code with zoom and pan controls*
+<img width="1699" height="879" alt="image" src="https://github.com/user-attachments/assets/f0fb8e38-5356-4074-9627-dce012221105" />
+
 
 ### 🤖 AI Chatbot
 
-![AI Chatbot](./screenshots/chatbot.png)
-*Intelligent AI tutor with Mem0-powered memory for personalized learning*
+<img width="1699" height="879" alt="image" src="https://github.com/user-attachments/assets/8d7a94cc-d521-4edc-b17b-9d5bbd081e73" />
 
 
 </div>
@@ -148,7 +147,7 @@ Whether you're debugging a recursive function or learning data structures, AlgoF
 | **CORS** | Security | Enables secure cross-origin requests between frontend and backend |
 | **dotenv** | Configuration | Environment variable management for API keys |
 
-**Deployment:** Render (Backend) - Reliable Node.js hosting with automatic deployments
+**ment:** Render (Backend) - Reliable Node.js hosting with automatic ments
 
 ---
 
@@ -323,7 +322,9 @@ npm run dev
 
 </details>
 
----### Deploy Backend to Render
+---
+
+### Deploy Backend to Render
 
 <details>
 <summary><b>Click to expand Render deployment steps</b></summary>
@@ -386,20 +387,9 @@ npm run dev
 ## 🏗️ System Architecture
 
 <div align="center">
-
-### Architecture Diagram
-
+<img width="1599" height="779" alt="image" src="https://github.com/user-attachments/assets/1d7ff58b-a43e-4c3b-bc07-34b456037aee" />
 
 </div>
-
-> **Note:** Create your architecture diagram using [Excalidraw](https://excalidraw.com/) and save it to `diagrams/architecture.png`
->
-> **Diagram should include:**
-> - Frontend components (React, Vite, Monaco Editor, React Flow)
-> - Backend services (Express, Gemini AI, Mem0)
-> - API endpoints and data flow
-> - Authentication flow
-> - Database/Storage (if applicable)
 
 ---
 
