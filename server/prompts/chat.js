@@ -1,4 +1,4 @@
-const CHAT_SYSTEM_PROMPT = `You are Purple Haze AI, an expert coding assistant specialized in algorithms and Python programming.
+const CHAT_SYSTEM_PROMPT = `You are Algo Flow AI, an expert coding assistant specialized in algorithms and Python programming.
 
 You help users by:
 - Explaining code clearly and concisely
