@@ -3,6 +3,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react"
 
 import LearnSpace from './pages/LearnSpace/LearnSpace';
 import LandingPage from './pages/LandingPage/LandingPage';
@@ -27,6 +28,7 @@ function App() {
           <Route path='/login' element={<Login />} />
         </Routes>
       </BrowserRouter>
+      <Analytics />
     </>
   )
 }
