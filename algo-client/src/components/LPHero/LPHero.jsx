@@ -19,8 +19,8 @@ function LPHero() {
                         Master algorithms <span className="break-mobile">from visual clarity</span>
                     </h1>
                     <p className="hero-subtitle">
-                        <span className="desktop-text">Stop tracing loops in your head. Start seeing them on screen. Turn complex code into clear visualizations. Learn faster, code smarter.</span>
-                        <span className="mobile-text">Visualize algorithms in real-time. Learn faster, code smarter.</span>
+                        <span className="desktop-text">Stop tracing loops in your head. Start seeing them on screen. <br></br>Turn complex code into clear visualizations. Learn faster, code smarter.</span>
+                        <span className="mobile-text">Visualize algorithms in real-time. <br></br>Learn faster, code smarter.</span>
                     </p>
                     <div className="hero-cta">
                         <button className="cta-primary" onClick={() => {navigate("/login")}}>Get Started</button>
