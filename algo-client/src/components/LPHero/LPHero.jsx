@@ -24,7 +24,7 @@ function LPHero() {
                     </p>
                     <div className="hero-cta">
                         <button className="cta-primary" onClick={() => {navigate("/login")}}>Get Started</button>
-                        <button className="cta-secondary">Watch Demo</button>
+                        <a href="https://youtu.be/j5MJTo73bes?si=JX1ssAckxzdPvdZE" target="__blank"><button className="cta-secondary">Watch Demo</button></a>
                     </div>
                     <div className="hero-demos">
                         <img src={Hero1} alt="Platform demo 1" className="demo-image" />
