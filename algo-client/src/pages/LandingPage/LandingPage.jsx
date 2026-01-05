@@ -33,6 +33,7 @@ function LandingPage() {
                     if (response.ok) {
                         setServerStatus('ready');
                         setStatusMessage('Server active');
+                        console.log("Server active!");
 
                         // Hide indicator after 2 seconds
                         setTimeout(() => {
