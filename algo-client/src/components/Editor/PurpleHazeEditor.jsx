@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Zap, MessageSquare, Eye, CodeXml, Play, SquareTerminal, Power } from 'lucide-react';
+import { Zap, MessageSquare, Eye, CodeXml, Play, SquareTerminal, Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import CodeFlowChartViewer from '../FlowChartViewer/CodeFlowChartViewer';
@@ -78,7 +78,6 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChang
   const [pyodideReady, setPyodideReady] = useState(false);
   const [waitingForInput, setWaitingForInput] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
@@ -436,18 +435,6 @@ await __main__()
     }
   };
 
-  const handleLogout = () => {
-    // Clear authentication data from localStorage
-    localStorage.removeItem('algoflow_user_id');
-    localStorage.removeItem('algoflow_login_time');
-
-    // Clear session storage
-    sessionStorage.clear();
-
-    // Navigate to landing page
-    navigate('/');
-  };
-
   // Mobile Warning Screen
   if (isMobile) {
     return (
@@ -540,6 +527,32 @@ await __main__()
           alignItems: 'center',
           gap: '12px'
         }}>
+          <button
+            onClick={() => navigate('/')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '8px',
+              borderRadius: '8px',
+              border: '1px solid rgba(168,85,247,0.3)',
+              backgroundColor: 'rgba(168,85,247,0.15)',
+              color: '#e9d5ff',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.3)';
+              e.currentTarget.style.borderColor = 'rgba(168,85,247,0.5)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.15)';
+              e.currentTarget.style.borderColor = 'rgba(168,85,247,0.3)';
+            }}
+            title="Back to Home"
+          >
+            <Home size={18} />
+          </button>
           <CodeXml
             size={20}
             color="#a855f7"
@@ -741,35 +754,6 @@ await __main__()
           >
             <MessageSquare size={14} />
             {serverStatus !== 'ready' ? 'Server Loading...' : 'AI Chat'}
-          </button>
-
-          <button
-            onClick={() => setShowLogoutModal(true)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '8px 16px',
-              borderRadius: '8px',
-              border: '1px solid rgba(239,68,68,0.3)',
-              backgroundColor: 'rgba(239,68,68,0.15)',
-              color: '#fca5a5',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontFamily: 'monospace'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.25)';
-              e.currentTarget.style.borderColor = 'rgba(239,68,68,0.5)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.15)';
-              e.currentTarget.style.borderColor = 'rgba(239,68,68,0.3)';
-            }}
-          >
-            <Power size={14} />
           </button>
         </div>
       </div>
@@ -1114,119 +1098,6 @@ await __main__()
                 </button>
               </form>
             )}
-          </div>
-        </div>
-      )}
-
-      {/* Logout Confirmation Modal */}
-      {showLogoutModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.7)',
-          zIndex: 10001,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backdropFilter: 'blur(8px)'
-        }}>
-          <div style={{
-            backgroundColor: '#0a0612',
-            border: '1px solid rgba(239,68,68,0.3)',
-            borderRadius: '16px',
-            padding: '32px',
-            minWidth: '400px',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-            animation: 'slideIn 0.3s ease-out'
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              marginBottom: '20px'
-            }}>
-              <Power size={24} color="#ef4444" />
-              <h3 style={{
-                margin: 0,
-                fontSize: '20px',
-                fontWeight: 600,
-                color: '#e9d5ff',
-                fontFamily: 'monospace'
-              }}>
-                Confirm Logout
-              </h3>
-            </div>
-
-            <p style={{
-              margin: '0 0 28px 0',
-              fontSize: '14px',
-              color: '#94a3b8',
-              lineHeight: '1.6',
-              fontFamily: 'monospace'
-            }}>
-              Are you sure you want to logout? Your code will be saved locally.
-            </p>
-
-            <div style={{
-              display: 'flex',
-              gap: '12px',
-              justifyContent: 'flex-end'
-            }}>
-              <button
-                onClick={() => setShowLogoutModal(false)}
-                style={{
-                  padding: '10px 24px',
-                  borderRadius: '8px',
-                  border: '1px solid rgba(168,85,247,0.3)',
-                  backgroundColor: 'rgba(168,85,247,0.15)',
-                  color: '#e9d5ff',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  fontFamily: 'monospace'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.25)';
-                  e.currentTarget.style.borderColor = 'rgba(168,85,247,0.5)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.15)';
-                  e.currentTarget.style.borderColor = 'rgba(168,85,247,0.3)';
-                }}
-              >
-                No, Stay
-              </button>
-
-              <button
-                onClick={handleLogout}
-                style={{
-                  padding: '10px 24px',
-                  borderRadius: '8px',
-                  border: '1px solid rgba(239,68,68,0.5)',
-                  backgroundColor: 'rgba(239,68,68,0.2)',
-                  color: '#fca5a5',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  fontFamily: 'monospace'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.3)';
-                  e.currentTarget.style.borderColor = 'rgba(239,68,68,0.7)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.2)';
-                  e.currentTarget.style.borderColor = 'rgba(239,68,68,0.5)';
-                }}
-              >
-                Yes, Logout
-              </button>
-            </div>
           </div>
         </div>
       )}

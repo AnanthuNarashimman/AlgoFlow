@@ -7,8 +7,6 @@ import { Analytics } from "@vercel/analytics/react"
 
 import LearnSpace from './pages/LearnSpace/LearnSpace';
 import LandingPage from './pages/LandingPage/LandingPage';
-import Login from './components/Login/Login';
-import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 
 function App() {
 
@@ -17,15 +15,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<LandingPage />} />
-          <Route
-            path="/learn-space"
-            element={
-              <ProtectedRoute>
-                <LearnSpace />
-              </ProtectedRoute>
-            }
-          />
-          <Route path='/login' element={<Login />} />
+          <Route path="/learn-space" element={<LearnSpace />} />
         </Routes>
       </BrowserRouter>
       <Analytics />

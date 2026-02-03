@@ -23,7 +23,7 @@ function LPHero() {
                         <span className="mobile-text">Visualize algorithms in real-time. <br></br>Learn faster, code smarter.</span>
                     </p>
                     <div className="hero-cta">
-                        <button className="cta-primary" onClick={() => {navigate("/login")}}>Get Started</button>
+                        <button className="cta-primary" onClick={() => {navigate("/learn-space")}}>Try It Free</button>
                         <a href="https://youtu.be/j5MJTo73bes?si=JX1ssAckxzdPvdZE" target="__blank"><button className="cta-secondary">Watch Demo</button></a>
                     </div>
                     <div className="hero-demos">
