@@ -4,7 +4,6 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { encryptKey, decryptKey } = require('../middleware/keyAuth');
 const config = require('../config');
 
-const ALLOWED_MODELS = ['gemini-2.5-flash-lite', 'gemini-2.5-flash', 'gemini-2.5-pro'];
 
 function cookieOptions() {
     return {
@@ -18,7 +17,7 @@ function cookieOptions() {
 // Validate key via countTokens (free call) then store encrypted in HttpOnly cookie
 router.post('/', async (req, res) => {
     const { apiKey } = req.body;
-    if (!apiKey || typeof apiKey !== 'string' || !apiKey.trim().startsWith('AIza')) {
+    if (!apiKey || typeof apiKey !== 'string' || !apiKey.trim()) {
         return res.status(400).json({ error: 'invalid_format', message: 'Invalid API key format' });
     }
 
