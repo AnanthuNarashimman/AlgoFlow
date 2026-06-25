@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Send, GripVertical, User, Bot, 
-  Sparkles, Zap, BookOpen, HelpCircle, MoreHorizontal, Code, X, AlertCircle, Sparkle
+import {
+  Send, GripVertical, User, Bot,
+  Sparkles, Zap, BookOpen, HelpCircle, MoreHorizontal, Code, X, AlertCircle, Sparkle, ChevronDown
 } from 'lucide-react';
 
 // Enhanced markdown-to-JSX renderer
@@ -195,7 +195,13 @@ const SUGGESTION_CHIPS = [
   { id: 'help', label: 'Help', icon: HelpCircle },
 ];
 
-export default function DraggableSideChat({ width = 400, onWidthChange, onClose, editorCode }) {
+const MODELS = [
+  { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite', hint: 'Fastest · Lowest cost'  },
+  { id: 'gemini-2.5-flash',      label: 'Gemini 2.5 Flash',      hint: 'Balanced performance'   },
+  { id: 'gemini-2.5-pro',        label: 'Gemini 2.5 Pro',        hint: 'Most capable'           },
+];
+
+export default function DraggableSideChat({ width = 400, onWidthChange, onClose, editorCode, onKeyExpired }) {
   // --- State ---
   const [isResizing, setIsResizing] = useState(false);
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
@@ -203,6 +209,10 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose,
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState(null);
   const [expandedMessages, setExpandedMessages] = useState({});
+  const [selectedModel, setSelectedModel] = useState(
+    () => localStorage.getItem('algoflow_chat_model') || 'gemini-2.5-flash-lite'
+  );
+  const [modelOpen, setModelOpen] = useState(false);
   
   // --- Refs ---
   const chatEndRef = useRef(null);
@@ -211,6 +221,11 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose,
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
+
+  // Persist model selection
+  useEffect(() => {
+    localStorage.setItem('algoflow_chat_model', selectedModel);
+  }, [selectedModel]);
 
   // --- Resizing Logic ---
   const startResizing = (e) => {
@@ -264,38 +279,52 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose,
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chat`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           code: editorCode || '',
           message: text,
-          conversationHistory: conversationHistory
+          conversationHistory,
+          model: selectedModel,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to get AI response');
+      setIsTyping(false);
+
+      if (response.status === 401) {
+        onKeyExpired?.();
+        setMessages(prev => [...prev, {
+          id: Date.now() + 1, role: 'ai', isCode: false,
+          text: "Your API key session expired. Please re-enter your key using the 🔑 button in the toolbar.",
+        }]);
+        return;
       }
 
+      if (response.status === 429) {
+        const data = await response.json().catch(() => ({}));
+        const msg = data.error === 'rate_limit'
+          ? "Rate limit hit — Gemini is receiving too many requests. Try again in a few seconds."
+          : "Your Gemini quota is exhausted. Check your usage at aistudio.google.com";
+        setMessages(prev => [...prev, {
+          id: Date.now() + 1, role: 'ai', isCode: false,
+          text: `⚠️ ${msg}`,
+        }]);
+        return;
+      }
+
+      if (!response.ok) throw new Error('Failed to get AI response');
+
       const data = await response.json();
-      
-      setIsTyping(false);
-      setMessages(prev => [...prev, { 
-        id: Date.now() + 1, 
-        role: 'ai', 
-        text: data.response,
-        isCode: false 
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1, role: 'ai', text: data.response, isCode: false
       }]);
     } catch (error) {
       console.error('Chat error:', error);
       setIsTyping(false);
-      setError('Failed to connect to AI. Make sure the backend server is running on port 4000.');
-      setMessages(prev => [...prev, { 
-        id: Date.now() + 1, 
-        role: 'ai', 
-        text: "I apologize, but I'm having trouble connecting to the AI service right now. Please make sure the backend server is running.",
-        isCode: false 
+      setError('Failed to connect to AI. Make sure the backend server is running.');
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1, role: 'ai', isCode: false,
+        text: "I'm having trouble connecting to the AI service right now. Please make sure the backend server is running.",
       }]);
     }
   };
@@ -489,7 +518,9 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose,
           padding: '20px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '20px'
+          gap: '20px',
+          backgroundImage: 'radial-gradient(rgba(168,85,247,0.13) 1px, transparent 1px)',
+          backgroundSize: '18px 18px',
         }}>
           {messages.map((msg) => {
             const isLongMessage = msg.text.length > 400;
@@ -542,11 +573,11 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose,
                   fontSize: '12.5px',
                   lineHeight: '1.5',
                   fontFamily: 'Inter, sans-serif',
-                  background: msg.role === 'user' ? 'rgba(168, 85, 247, 0.08)' : 'rgba(255, 255, 255, 0.03)',
-                  color: msg.role === 'user' ? '#cbd5e1' : '#cbd5e1',
-                  border: msg.role === 'user' 
-                    ? '1px solid rgba(168, 85, 247, 0.15)' 
-                    : '1px solid rgba(255, 255, 255, 0.05)',
+                  background: msg.role === 'user' ? '#140a26' : '#0f0c1a',
+                  color: '#cbd5e1',
+                  border: msg.role === 'user'
+                    ? '1px solid rgba(168, 85, 247, 0.18)'
+                    : '1px solid rgba(255, 255, 255, 0.07)',
                   borderTopRightRadius: msg.role === 'user' ? '2px' : '12px',
                   borderTopLeftRadius: msg.role === 'ai' ? '2px' : '12px',
                   wordWrap: 'break-word'
@@ -588,28 +619,34 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose,
             );
           })}
           {isTyping && (
-            <div style={{
-              display: 'flex',
-              gap: '4px',
-              padding: '12px 16px',
-              background: 'rgba(255, 255, 255, 0.02)',
-              borderRadius: '12px',
-              width: 'fit-content',
-              marginLeft: '44px'
-            }}>
-              {[0, 1, 2].map((i) => (
-                <div 
-                  key={i}
-                  style={{
-                    width: '6px',
-                    height: '6px',
-                    background: '#64748b',
-                    borderRadius: '50%',
-                    animation: 'bounce 0.6s infinite alternate',
-                    animationDelay: `${i * 0.1}s`
-                  }}
-                />
-              ))}
+            <div style={{ display: 'flex', gap: '12px', animation: 'fadeIn 0.3s ease-out' }}>
+              <div style={{
+                width: '32px', height: '32px', borderRadius: '8px', flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(168,85,247,0.12)', color: '#a855f7',
+                border: '1px solid rgba(168,85,247,0.2)',
+              }}>
+                <Bot size={16} />
+              </div>
+              <div style={{
+                display: 'flex', gap: '4px', alignItems: 'center',
+                padding: '10px 14px',
+                background: '#0f0c1a',
+                border: '1px solid rgba(255,255,255,0.07)',
+                borderRadius: '12px', borderTopLeftRadius: '2px',
+              }}>
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    style={{
+                      width: '6px', height: '6px',
+                      background: '#64748b', borderRadius: '50%',
+                      animation: 'bounce 0.6s infinite alternate',
+                      animationDelay: `${i * 0.15}s`
+                    }}
+                  />
+                ))}
+              </div>
             </div>
           )}
           <div ref={chatEndRef} />
@@ -617,13 +654,88 @@ export default function DraggableSideChat({ width = 400, onWidthChange, onClose,
 
         {/* Input Area */}
         <div style={{
-          padding: '16px',
+          padding: '12px 16px 16px',
           background: 'rgba(12, 9, 21, 0.8)',
           backdropFilter: 'blur(10px)',
           borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-          flexShrink: 0
+          flexShrink: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
         }}>
-          <form 
+          {/* Model selector dropdown */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setModelOpen(v => !v)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '6px 10px', borderRadius: '8px',
+                background: modelOpen ? 'rgba(168,85,247,0.12)' : 'rgba(255,255,255,0.03)',
+                border: modelOpen ? '1px solid rgba(168,85,247,0.35)' : '1px solid rgba(255,255,255,0.07)',
+                color: '#94a3b8', cursor: 'pointer',
+                fontSize: '11.5px', fontFamily: 'monospace', fontWeight: 600,
+                transition: 'all 0.15s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(168,85,247,0.1)';
+                e.currentTarget.style.borderColor = 'rgba(168,85,247,0.3)';
+                e.currentTarget.style.color = '#e9d5ff';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = modelOpen ? 'rgba(168,85,247,0.12)' : 'rgba(255,255,255,0.03)';
+                e.currentTarget.style.borderColor = modelOpen ? 'rgba(168,85,247,0.35)' : 'rgba(255,255,255,0.07)';
+                e.currentTarget.style.color = '#94a3b8';
+              }}
+            >
+              {MODELS.find(m => m.id === selectedModel)?.label ?? 'Model'}
+              <ChevronDown
+                size={12}
+                style={{ transform: modelOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
+              />
+            </button>
+
+            {/* Dropdown list */}
+            <div style={{
+              position: 'absolute', bottom: 'calc(100% + 6px)', left: 0, zIndex: 50,
+              minWidth: '200px',
+              background: '#0c0915',
+              border: `1px solid ${modelOpen ? 'rgba(168,85,247,0.2)' : 'transparent'}`,
+              borderRadius: '10px', overflow: 'hidden',
+              boxShadow: modelOpen ? '0 -8px 24px rgba(0,0,0,0.5)' : 'none',
+              maxHeight: modelOpen ? '260px' : '0px',
+              opacity: modelOpen ? 1 : 0,
+              transform: modelOpen ? 'translateY(0)' : 'translateY(6px)',
+              transition: 'max-height 0.25s ease, opacity 0.18s ease, transform 0.18s ease, border-color 0.18s ease',
+              pointerEvents: modelOpen ? 'auto' : 'none',
+            }}>
+              <div style={{ maxHeight: '260px', overflowY: 'auto' }}>
+                {MODELS.map((m, i) => (
+                  <div
+                    key={m.id}
+                    onClick={() => { setSelectedModel(m.id); setModelOpen(false); }}
+                    style={{
+                      display: 'flex', alignItems: 'center',
+                      padding: '9px 14px',
+                      borderBottom: i < MODELS.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                      cursor: 'pointer', transition: 'background 0.15s',
+                      fontFamily: 'monospace', fontSize: '12px',
+                      color: selectedModel === m.id ? '#e9d5ff' : '#94a3b8',
+                      background: selectedModel === m.id ? 'rgba(168,85,247,0.1)' : 'transparent',
+                    }}
+                    onMouseEnter={(e) => { if (selectedModel !== m.id) e.currentTarget.style.background = 'rgba(168,85,247,0.07)'; }}
+                    onMouseLeave={(e) => { if (selectedModel !== m.id) e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    <div>
+                      <div style={{ fontWeight: 600 }}>{m.label}</div>
+                      <div style={{ fontSize: '10.5px', color: '#475569', marginTop: '1px', fontFamily: 'Inter, sans-serif' }}>{m.hint}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <form
             onSubmit={handleChatSubmit}
             style={{
               position: 'relative',

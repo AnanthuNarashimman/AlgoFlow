@@ -6,6 +6,7 @@ import MagicBento from "../../components/MagicBento/MagicBento";
 import LPGIT from "../../components/LPGit/LPGIT";
 import LPFooter from "../../components/LPFooter/LPFooter";
 import PillNav from "../../components/LPNav/PillNav";
+import LPBYOK from "../../components/LPBYOK/LPBYOK";
 
 
 import "./LandingPage.css"
@@ -116,6 +117,10 @@ function LandingPage() {
 
             <section id="about">
                 <LPUse />
+            </section>
+
+            <section id="privacy">
+                <LPBYOK />
             </section>
 
             <section id="tech-stack">

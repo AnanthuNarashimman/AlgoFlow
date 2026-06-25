@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Zap, MessageSquare, Eye, CodeXml, Play, SquareTerminal, Home } from 'lucide-react';
+import { Zap, MessageSquare, Eye, CodeXml, Play, SquareTerminal, Home, KeyRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import CodeFlowChartViewer from '../FlowChartViewer/CodeFlowChartViewer';
@@ -42,7 +42,7 @@ goodName = input("Enter your name:")
 print(f"Welcome to AlgoFlow, {goodName}")
 `;
 
-export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChange }) {
+export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChange, keyValid, onKeyExpired, onOpenKeySettings }) {
   const navigate = useNavigate();
 
   const [isMobile, setIsMobile] = useState(false);
@@ -139,7 +139,8 @@ export default function PurpleHazeEditor({ onToggleChat, isChatOpen, onCodeChang
         try {
           const response = await fetch(`${API_URL}/api/health`, {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
           });
 
           if (response.ok) {
@@ -409,11 +410,27 @@ await __main__()
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/generate`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ code }),
       });
+
+      if (response.status === 401) {
+        onKeyExpired?.();
+        setShowVisualizer(false);
+        return;
+      }
+
+      if (response.status === 429) {
+        const data = await response.json().catch(() => ({}));
+        const msg = data.error === 'rate_limit'
+          ? "Rate limit hit — Gemini is receiving too many requests. Try again in a few seconds."
+          : "Gemini quota exhausted. Check your usage at aistudio.google.com";
+        setOutput(prev => [...prev, { type: 'error', content: `⚠ ${msg}` }]);
+        setOutputPanelOpen(true);
+        setShowVisualizer(false);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error('Failed to generate flowchart');
@@ -421,14 +438,13 @@ await __main__()
 
       const data = await response.json();
       setFlowchartData(data);
-
-      // Cache the flowchart data and the code used to generate it
       localStorage.setItem('algoflow_flowchart_data', JSON.stringify(data));
       localStorage.setItem('algoflow_last_visualized_code', code);
       setLastVisualizedCode(code);
     } catch (error) {
       console.error('Error generating flowchart:', error);
-      alert('Failed to generate flowchart. Make sure the backend server is running on port 4000.');
+      setOutput(prev => [...prev, { type: 'error', content: '⚠ Failed to generate flowchart. Make sure the backend server is running.' }]);
+      setOutputPanelOpen(true);
       setShowVisualizer(false);
     } finally {
       setIsGenerating(false);
@@ -609,8 +625,30 @@ await __main__()
           )}
         </div>
 
-        {/* Right side - Run Button */}
+        {/* Right side - Action buttons */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* Key settings */}
+          <button
+            onClick={onOpenKeySettings}
+            title={keyValid ? 'Manage API Key' : 'Enter API Key'}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: '34px', height: '34px',
+              borderRadius: '8px',
+              border: `1px solid ${keyValid ? 'rgba(168,85,247,0.3)' : 'rgba(239,68,68,0.4)'}`,
+              backgroundColor: keyValid ? 'rgba(168,85,247,0.1)' : 'rgba(239,68,68,0.1)',
+              color: keyValid ? '#a855f7' : '#f87171',
+              cursor: 'pointer', transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = keyValid ? 'rgba(168,85,247,0.2)' : 'rgba(239,68,68,0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = keyValid ? 'rgba(168,85,247,0.1)' : 'rgba(239,68,68,0.1)';
+            }}
+          >
+            <KeyRound size={15} />
+          </button>
           <button
             onClick={handleRun}
             style={{
@@ -643,7 +681,7 @@ await __main__()
 
           <button
             onClick={handleVisualize}
-            disabled={isGenerating || serverStatus !== 'ready'}
+            disabled={isGenerating || serverStatus !== 'ready' || !keyValid}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -652,22 +690,22 @@ await __main__()
               borderRadius: '8px',
               border: '1px solid rgba(168,85,247,0.3)',
               backgroundColor: showVisualizer ? 'rgba(168,85,247,0.25)' : 'rgba(168,85,247,0.15)',
-              color: serverStatus !== 'ready' ? '#64748b' : '#e9d5ff',
+              color: (serverStatus !== 'ready' || !keyValid) ? '#64748b' : '#e9d5ff',
               fontSize: '13px',
               fontWeight: 600,
-              cursor: serverStatus !== 'ready' ? 'not-allowed' : 'pointer',
+              cursor: (serverStatus !== 'ready' || !keyValid) ? 'not-allowed' : 'pointer',
               transition: 'all 0.2s',
               fontFamily: 'monospace',
-              opacity: serverStatus !== 'ready' ? 0.5 : 1
+              opacity: (serverStatus !== 'ready' || !keyValid) ? 0.5 : 1
             }}
             onMouseEnter={(e) => {
-              if (serverStatus === 'ready') {
+              if (serverStatus === 'ready' && keyValid) {
                 e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.3)';
                 e.currentTarget.style.borderColor = 'rgba(168,85,247,0.5)';
               }
             }}
             onMouseLeave={(e) => {
-              if (serverStatus === 'ready') {
+              if (serverStatus === 'ready' && keyValid) {
                 e.currentTarget.style.backgroundColor = showVisualizer ? 'rgba(168,85,247,0.25)' : 'rgba(168,85,247,0.15)';
                 e.currentTarget.style.borderColor = 'rgba(168,85,247,0.3)';
               }
@@ -722,7 +760,7 @@ await __main__()
 
           <button
             onClick={onToggleChat}
-            disabled={serverStatus !== 'ready'}
+            disabled={serverStatus !== 'ready' || !keyValid}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -731,22 +769,22 @@ await __main__()
               borderRadius: '8px',
               border: '1px solid rgba(168,85,247,0.3)',
               backgroundColor: isChatOpen ? 'rgba(168,85,247,0.25)' : 'rgba(168,85,247,0.15)',
-              color: serverStatus !== 'ready' ? '#64748b' : '#e9d5ff',
+              color: (serverStatus !== 'ready' || !keyValid) ? '#64748b' : '#e9d5ff',
               fontSize: '13px',
               fontWeight: 600,
-              cursor: serverStatus !== 'ready' ? 'not-allowed' : 'pointer',
+              cursor: (serverStatus !== 'ready' || !keyValid) ? 'not-allowed' : 'pointer',
               transition: 'all 0.2s',
               fontFamily: 'monospace',
-              opacity: serverStatus !== 'ready' ? 0.5 : 1
+              opacity: (serverStatus !== 'ready' || !keyValid) ? 0.5 : 1
             }}
             onMouseEnter={(e) => {
-              if (serverStatus === 'ready') {
+              if (serverStatus === 'ready' && keyValid) {
                 e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.3)';
                 e.currentTarget.style.borderColor = 'rgba(168,85,247,0.5)';
               }
             }}
             onMouseLeave={(e) => {
-              if (serverStatus === 'ready') {
+              if (serverStatus === 'ready' && keyValid) {
                 e.currentTarget.style.backgroundColor = isChatOpen ? 'rgba(168,85,247,0.25)' : 'rgba(168,85,247,0.15)';
                 e.currentTarget.style.borderColor = 'rgba(168,85,247,0.3)';
               }
